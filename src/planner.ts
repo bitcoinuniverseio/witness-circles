@@ -1,11 +1,12 @@
 import { bytesToHex, hexToBytes } from "./bytes.js";
 import {
+  isWitnessLaunchNetwork,
   MAX_MONEY_SATS,
   MIN_SUCCESSOR_VALUE_SATS,
   REQUIRED_LOCK_TIME,
   REQUIRED_SEQUENCE,
   REQUIRED_TRANSACTION_VERSION,
-  type WitnessNetwork,
+  type WitnessLaunchNetwork,
 } from "./constants.js";
 import { invariant } from "./errors.js";
 import { sha256 } from "./hash.js";
@@ -35,7 +36,7 @@ export interface CircleParticipantPlanInput extends OutPoint {
 }
 
 export interface CirclePlanRequest {
-  readonly network: WitnessNetwork;
+  readonly network: WitnessLaunchNetwork;
   readonly manifest: CircleContextManifest;
   readonly participants: readonly CircleParticipantPlanInput[];
   readonly feeRateSatsPerVbyte: bigint;
@@ -51,7 +52,7 @@ export interface CirclePlannedParticipant extends CircleParticipantPlanInput {
 export interface CirclePlan {
   readonly protocol: "witc";
   readonly version: 1;
-  readonly network: WitnessNetwork;
+  readonly network: WitnessLaunchNetwork;
   readonly contextHash: string;
   readonly canonicalManifest: string;
   readonly unsignedTransaction: BitcoinTransaction;
@@ -106,6 +107,11 @@ export function estimateCircleVsize(participantCount: number, explicitSighashAll
 }
 
 export function buildCirclePlan(request: CirclePlanRequest): CirclePlan {
+  invariant(
+    isWitnessLaunchNetwork(request.network),
+    "INVALID_NETWORK",
+    "Circle creation is enabled only on Signet and regtest",
+  );
   const manifest = validateContextManifest(request.manifest);
   invariant(
     request.participants.length >= 2 && request.participants.length <= 16,

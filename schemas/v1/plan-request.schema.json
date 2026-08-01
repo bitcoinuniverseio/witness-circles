@@ -6,7 +6,7 @@
   "additionalProperties": false,
   "required": ["network", "manifest", "participants", "feeRateSatsPerVbyte"],
   "properties": {
-    "network": { "enum": ["mainnet", "testnet3", "signet", "regtest"] },
+    "network": { "enum": ["signet", "regtest"] },
     "manifest": { "$ref": "context-manifest.schema.json" },
     "feeRateSatsPerVbyte": { "type": "string", "pattern": "^[1-9][0-9]*$" },
     "participants": {

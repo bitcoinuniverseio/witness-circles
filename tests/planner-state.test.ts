@@ -364,6 +364,27 @@ describe("planner and state engine", () => {
     });
   });
 
+  it("fails closed when Circle creation is requested outside Signet or regtest", () => {
+    const vector = loadGolden();
+    const participants = vector.prevouts.slice(0, 2).map((prevout) => ({
+      txid: prevout.txid,
+      vout: prevout.vout,
+      value: BigInt(prevout.valueSats),
+      scriptPubKey: Uint8Array.from(Buffer.from(prevout.scriptPubKey, "hex")),
+      blockHeight: prevout.blockHeight,
+      maximumFeeShare: 2_000n,
+    }));
+
+    expect(() =>
+      buildCirclePlan({
+        network: "mainnet" as never,
+        manifest: vector.manifest as never,
+        participants,
+        feeRateSatsPerVbyte: 10n,
+      }),
+    ).toThrow(/only on Signet and regtest/);
+  });
+
   it("rejects nonintegral positions and aggregate values above MAX_MONEY", () => {
     const vector = loadGolden();
     const participants = vector.prevouts.slice(0, 2).map((prevout) => ({

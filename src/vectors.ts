@@ -1,8 +1,8 @@
-import { bytesToHex, hexToBytes } from "./bytes.js";
+import { hexToBytes } from "./bytes.js";
 import type { WitnessNetwork } from "./constants.js";
 import { invariant } from "./errors.js";
 import { canonicalizeContextManifest, contextHash } from "./manifest.js";
-import { encodeMarkerScript } from "./marker.js";
+import { decodeMarkerScript } from "./marker.js";
 import { deriveLineageId, WitnessStateEngine } from "./state.js";
 import type { OutPoint } from "./transaction.js";
 import { decodeTransaction } from "./transaction.js";
@@ -94,14 +94,11 @@ export function verifyGoldenCircleVector(value: GoldenCircleVector): {
     "INVALID_CONTEXT_MANIFEST",
     "Golden context hash differs",
   );
+  const marker = decodeMarkerScript(hexToBytes(value.markerScript));
   invariant(
-    bytesToHex(
-      encodeMarkerScript({
-        network: value.network,
-        participantCount: value.prevouts.length,
-        contextHash: value.contextHash,
-      }),
-    ) === value.markerScript,
+    marker.network === value.network &&
+      marker.participantCount === value.prevouts.length &&
+      marker.contextHash === value.contextHash,
     "INVALID_MARKER",
     "Golden marker script differs",
   );
