@@ -72,10 +72,10 @@ describe("context manifests and markers", () => {
     ).toThrow(WitnessProtocolError);
   });
 
-  it("round trips markers across every network and participant count", () => {
+  it("round trips markers across every enabled creation network and participant count", () => {
     fc.assert(
       fc.property(
-        fc.constantFrom("mainnet", "testnet3", "signet", "regtest" as const),
+        fc.constantFrom("signet", "regtest" as const),
         fc.integer({ min: 2, max: 16 }),
         fc
           .uint8Array({ minLength: 32, maxLength: 32 })
@@ -89,6 +89,16 @@ describe("context manifests and markers", () => {
         },
       ),
     );
+  });
+
+  it("fails closed when marker creation is requested outside Signet or regtest", () => {
+    expect(() =>
+      encodeMarkerScript({
+        network: "mainnet" as never,
+        participantCount: 2,
+        contextHash: "11".repeat(32),
+      }),
+    ).toThrow(/only on Signet and regtest/);
   });
 
   it("rejects noncanonical marker pushes", () => {

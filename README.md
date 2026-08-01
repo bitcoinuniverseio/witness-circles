@@ -12,7 +12,7 @@ It does not prove identity, attendance, friendship, intent outside the transacti
 
 ## Status
 
-Version 1 is experimental. The reference implementation is suitable for parser interoperability, wallet safety review, regtest, and Signet testing. Mainnet creation is not declared production ready.
+Version 1 is experimental. The reference implementation is suitable for parser interoperability, wallet safety review, regtest, and Signet testing. Planning and marker creation fail closed outside Signet and regtest. Mainnet and testnet3 identifiers remain parseable for read-only interoperability only.
 
 Public source repository: [github.com/bitcoinuniverse/witness-circles](https://github.com/bitcoinuniverse/witness-circles)
 

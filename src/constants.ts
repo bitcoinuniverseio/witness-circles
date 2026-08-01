@@ -23,6 +23,11 @@ export const NETWORK_IDS = {
 
 export type WitnessNetwork = keyof typeof NETWORK_IDS;
 export type WitnessNetworkId = (typeof NETWORK_IDS)[WitnessNetwork];
+export type WitnessLaunchNetwork = "signet" | "regtest";
+
+export function isWitnessLaunchNetwork(network: WitnessNetwork): network is WitnessLaunchNetwork {
+  return network === "signet" || network === "regtest";
+}
 
 export const NETWORK_NAMES = {
   0: "mainnet",

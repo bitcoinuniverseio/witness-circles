@@ -3,7 +3,11 @@ import { readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { bytesToHex, hexToBytes } from "./bytes.js";
-import type { WitnessNetwork } from "./constants.js";
+import {
+  isWitnessLaunchNetwork,
+  type WitnessLaunchNetwork,
+  type WitnessNetwork,
+} from "./constants.js";
 import { WitnessProtocolError } from "./errors.js";
 import { canonicalizeContextManifest, contextHash } from "./manifest.js";
 import { decodeMarkerScript, encodeMarkerScript } from "./marker.js";
@@ -34,7 +38,8 @@ Usage:
   witc validate --tx <raw.hex|json> --prevouts <prevouts.json> --height <n> --network <network> [--unsigned]
   witc vectors verify [golden-circle.json] [state-lifecycle.json]
 
-Networks: mainnet, testnet3, signet, regtest
+Creation networks: signet, regtest
+Read-only validation networks: mainnet, testnet3, signet, regtest
 Validation verifies signatures unless --unsigned is present.`;
 }
 
@@ -46,6 +51,10 @@ function option(args: readonly string[], name: string): string {
 
 function isNetwork(value: string): value is WitnessNetwork {
   return value === "mainnet" || value === "testnet3" || value === "signet" || value === "regtest";
+}
+
+function isLaunchNetwork(value: string): value is WitnessLaunchNetwork {
+  return isNetwork(value) && isWitnessLaunchNetwork(value);
 }
 
 function json(value: unknown): string {
@@ -84,7 +93,8 @@ async function run(args: readonly string[]): Promise<unknown> {
   }
   if (group === "marker" && command === "encode") {
     const network = option(args, "--network");
-    if (!isNetwork(network)) throw new Error(`Unsupported network: ${network}`);
+    if (!isLaunchNetwork(network))
+      throw new Error(`Creation network must be signet or regtest: ${network}`);
     const participantCount = Number(option(args, "--participants"));
     const hash = option(args, "--context-hash");
     return {
@@ -106,8 +116,8 @@ async function run(args: readonly string[]): Promise<unknown> {
   if (group === "plan" && command !== undefined) {
     const request = (await readJson(command)) as Record<string, unknown>;
     const network = request["network"];
-    if (typeof network !== "string" || !isNetwork(network))
-      throw new Error("Plan network is invalid");
+    if (typeof network !== "string" || !isLaunchNetwork(network))
+      throw new Error("Plan network must be signet or regtest");
     if (!Array.isArray(request["participants"]))
       throw new Error("Plan participants must be an array");
     if (typeof request["feeRateSatsPerVbyte"] !== "string")

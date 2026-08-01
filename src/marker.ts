@@ -1,12 +1,14 @@
 import { bytesToHex, hexToBytes, utf8Bytes } from "./bytes.js";
 import {
   CIRCLE_OPCODE,
+  isWitnessLaunchNetwork,
   MARKER_PAYLOAD_LENGTH,
   MARKER_SCRIPT_LENGTH,
   NETWORK_IDS,
   NETWORK_NAMES,
   PROTOCOL_MAGIC,
   PROTOCOL_VERSION,
+  type WitnessLaunchNetwork,
   type WitnessNetwork,
   type WitnessNetworkId,
 } from "./constants.js";
@@ -23,10 +25,15 @@ export interface CircleMarker {
 }
 
 export function encodeMarkerPayload(input: {
-  readonly network: WitnessNetwork;
+  readonly network: WitnessLaunchNetwork;
   readonly participantCount: number;
   readonly contextHash: string;
 }): Uint8Array {
+  invariant(
+    isWitnessLaunchNetwork(input.network),
+    "INVALID_NETWORK",
+    "Marker creation is enabled only on Signet and regtest",
+  );
   const hash = hexToBytes(input.contextHash, 32);
   invariant(
     input.participantCount >= 2 && input.participantCount <= 16,
@@ -49,7 +56,7 @@ export function encodeMarkerPayload(input: {
 }
 
 export function encodeMarkerScript(input: {
-  readonly network: WitnessNetwork;
+  readonly network: WitnessLaunchNetwork;
   readonly participantCount: number;
   readonly contextHash: string;
 }): Uint8Array {

@@ -37,6 +37,8 @@ witc tx decode <raw-transaction-hex>
 witc plan <request.json>
 witc validate --tx <file> --prevouts <file> --height 200 --network signet
 witc validate --tx <file> --prevouts <file> --height 200 --network signet --unsigned
+
+Circle planning and marker creation accept only `signet` or `regtest`. Validation can inspect all assigned network identifiers so independent tools can classify data without enabling creation or broadcast.
 witc vectors verify [golden-circle.json]
 ```
 
