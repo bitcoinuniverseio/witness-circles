@@ -19,6 +19,10 @@ All notable changes are documented here. Versions follow Semantic Versioning whi
 - Static commercial and documentation website
 - CI, container, security-header, and configuration examples
 
+### Fixed
+
+- Aligned manifest runtime validation with JSON Schema code-point limits, exact UTC timestamps, well-formed Unicode, and lowercase alias keys
+
 ### Deliberate exclusions
 
 - Mainnet production declaration

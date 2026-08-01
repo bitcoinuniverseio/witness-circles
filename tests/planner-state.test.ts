@@ -4,14 +4,81 @@ import {
   type CircleContextManifest,
   type CirclePrevout,
   estimateCircleVsize,
+  hashWitnessState,
   outpointKey,
   toCirclePsbtPlan,
   validateCircle,
   WitnessStateEngine,
+  type WitnessStateSnapshot,
 } from "../src/index.js";
 import { goldenContext, loadGolden, privateKey, signTransaction } from "./fixture.js";
 
 describe("planner and state engine", () => {
+  it("keeps state ordering and hashes independent of the host locale", () => {
+    const low = "aa".repeat(32);
+    const high = "ff".repeat(32);
+    const snapshot: WitnessStateSnapshot = {
+      protocol: "witc",
+      version: 1,
+      revision: 2,
+      lineages: [high, low].map((lineageId) => ({
+        lineageId,
+        genesisOutpoint: `${lineageId}:0`,
+        currentOutpoint: `${lineageId}:1`,
+        status: "active",
+        firstHeight: 1,
+        lastHeight: 2,
+        circleCount: 1,
+        closedByTxid: null,
+      })),
+      shards: [high, low].map((txid) => ({
+        outpoint: `${txid}:1`,
+        lineageId: txid,
+        scriptPubKey: `5120${txid}`,
+        valueSats: "1000",
+        createdByCircle: txid,
+        previousOutpoint: `${txid}:0`,
+        createdHeight: 2,
+        spentByTxid: null,
+        spentHeight: null,
+      })),
+      circles: [high, low].map((txid) => ({
+        txid,
+        wtxid: txid,
+        contextHash: txid,
+        participantCount: 2,
+        feeSats: "200",
+        blockHeight: 2,
+        blockHash: high,
+        transactionIndex: 0,
+        members: [],
+      })),
+      edges: [high, low].map((toCircle) => ({
+        fromCircle: low,
+        toCircle,
+        lineageId: toCircle,
+        viaOutpoint: `${toCircle}:1`,
+      })),
+    };
+    const baselineHash = hashWitnessState(snapshot);
+    const originalLocaleCompare = String.prototype.localeCompare;
+    let localizedHash: string;
+    let localizedOrder: string[];
+    try {
+      const danish = new Intl.Collator("da");
+      String.prototype.localeCompare = function localeCompare(other: string): number {
+        return danish.compare(String(this), other);
+      };
+      const engine = new WitnessStateEngine(snapshot);
+      localizedHash = engine.stateHash();
+      localizedOrder = engine.snapshot().lineages.map(({ lineageId }) => lineageId);
+    } finally {
+      String.prototype.localeCompare = originalLocaleCompare;
+    }
+    expect(localizedOrder).toEqual([low, high]);
+    expect(localizedHash).toBe(baselineHash);
+  });
+
   it("uses the exact vsize formula", () => {
     expect(estimateCircleVsize(2)).toBe(263);
     expect(estimateCircleVsize(4)).toBe(464);

@@ -1,7 +1,7 @@
 import { bytesToHex, hexToBytes, utf8Bytes } from "./bytes.js";
 import { invariant } from "./errors.js";
 import { sha256 } from "./hash.js";
-import { canonicalizeJson, type JsonValue } from "./jcs.js";
+import { assertValidUnicode, canonicalizeJson, type JsonValue } from "./jcs.js";
 
 export interface ManifestAlias {
   readonly key: string;
@@ -51,16 +51,17 @@ function assertBoundedString(
   maximum: number,
 ): asserts value is string {
   invariant(typeof value === "string", "INVALID_CONTEXT_MANIFEST", `${field} must be a string`);
-  const bytes = utf8Bytes(value).length;
+  assertValidUnicode(value);
+  const codePoints = [...value].length;
   invariant(
-    bytes >= minimum && bytes <= maximum,
+    codePoints >= minimum && codePoints <= maximum,
     "INVALID_CONTEXT_MANIFEST",
-    `${field} has an invalid UTF-8 byte length`,
+    `${field} has an invalid Unicode code point length`,
     {
       field,
       minimum,
       maximum,
-      actual: bytes,
+      actual: codePoints,
     },
   );
 }
@@ -76,6 +77,14 @@ function parseUtc(value: string, field: string): number {
     Number.isFinite(parsed),
     "INVALID_CONTEXT_MANIFEST",
     `${field} is not a valid timestamp`,
+  );
+  const normalizedInput = value.includes(".")
+    ? value.replace(/\.(\d{1,3})Z$/, (_match, fraction: string) => `.${fraction.padEnd(3, "0")}Z`)
+    : value.replace(/Z$/, ".000Z");
+  invariant(
+    new Date(parsed).toISOString() === normalizedInput,
+    "INVALID_CONTEXT_MANIFEST",
+    `${field} is not a real UTC calendar timestamp`,
   );
   return parsed;
 }
@@ -127,9 +136,9 @@ export function validateContextManifest(value: unknown): CircleContextManifest {
         "Alias contains an unknown field",
       );
       invariant(
-        typeof alias["key"] === "string",
+        typeof alias["key"] === "string" && /^[0-9a-f]{64}$/.test(alias["key"]),
         "INVALID_CONTEXT_MANIFEST",
-        "Alias key must be a string",
+        "Alias key must be 32 bytes of lowercase hex",
       );
       hexToBytes(alias["key"], 32);
       assertBoundedString(alias["label"], "alias.label", 1, 48);
