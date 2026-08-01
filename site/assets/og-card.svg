@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Witness Circles</title>
+  <desc id="desc">Sign one Bitcoin moment together</desc>
+  <rect width="1200" height="630" fill="#f5f1e7"/>
+  <path d="M0 470C240 385 425 540 650 430c200-98 360-56 550-145v345H0z" fill="#315c4c" opacity=".12"/>
+  <g transform="translate(855 315)" fill="none" stroke="#c45b2a" stroke-width="13">
+    <circle cy="-165" r="25"/><circle cx="143" cy="-82" r="25"/><circle cx="143" cy="82" r="25"/>
+    <circle cy="165" r="25"/><circle cx="-143" cy="82" r="25"/><circle cx="-143" cy="-82" r="25"/>
+    <path d="M0-140V-40M120-68L34-20M120 68L34 20M0 140V40M-120 68L-34 20M-120-68L-34-20" opacity=".55"/>
+    <rect x="-38" y="-38" width="76" height="76" rx="8" fill="#13221e" stroke="none"/>
+  </g>
+  <text x="86" y="210" font-family="system-ui,sans-serif" font-size="76" font-weight="750" fill="#13221e">Witness Circles</text>
+  <text x="90" y="296" font-family="system-ui,sans-serif" font-size="37" fill="#315c4c">Sign one Bitcoin moment together.</text>
+  <text x="90" y="398" font-family="ui-monospace,monospace" font-size="22" fill="#8b3a32">WITC v1 · EXPERIMENTAL · NO TOKEN</text>
+</svg>

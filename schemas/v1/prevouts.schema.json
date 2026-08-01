@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bitcoinuniverse.dev/witc/v1/prevouts.schema.json",
+  "title": "Witness Circles validation prevouts",
+  "type": "array",
+  "minItems": 2,
+  "maxItems": 16,
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["txid", "vout", "valueSats", "scriptPubKey", "blockHeight"],
+    "properties": {
+      "txid": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+      "vout": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+      "valueSats": { "type": "string", "pattern": "^(0|[1-9][0-9]*)$" },
+      "scriptPubKey": { "type": "string", "pattern": "^5120[0-9a-fA-F]{64}$" },
+      "blockHeight": { "type": "integer", "minimum": 0 }
+    }
+  }
+}

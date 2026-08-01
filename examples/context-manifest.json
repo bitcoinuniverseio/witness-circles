@@ -1,0 +1,10 @@
+{
+  "created": "2026-08-01T18:00:00Z",
+  "expires": "2026-08-01T19:00:00Z",
+  "kind": "circle",
+  "nonce": "90e8f5cf27f04c89a6657bc9c60e3021",
+  "orbit": "signet-builders",
+  "protocol": "witc",
+  "title": "Reference genesis circle",
+  "version": 1
+}

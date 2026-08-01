@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bitcoinuniverse.dev/witc/v1/marker.schema.json",
+  "title": "Decoded Witness Circles v1 marker",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "magic",
+    "version",
+    "network",
+    "networkId",
+    "opcode",
+    "participantCount",
+    "contextHash"
+  ],
+  "properties": {
+    "magic": { "const": "WITC" },
+    "version": { "const": 1 },
+    "network": { "enum": ["mainnet", "testnet3", "signet", "regtest"] },
+    "networkId": { "type": "integer", "minimum": 0, "maximum": 3 },
+    "opcode": { "const": 1 },
+    "participantCount": { "type": "integer", "minimum": 2, "maximum": 16 },
+    "contextHash": { "type": "string", "pattern": "^(?!0{64})[0-9a-f]{64}$" }
+  }
+}

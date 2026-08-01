@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "valid": [
+    {
+      "name": "signet-three-participant",
+      "script": "6a285749544301020103ad2608134839e732280cb93bdd5b8682626dce5748a65c437a39cdcb680c2a82",
+      "network": "signet",
+      "participants": 3,
+      "contextHash": "ad2608134839e732280cb93bdd5b8682626dce5748a65c437a39cdcb680c2a82"
+    }
+  ],
+  "invalid": [
+    {
+      "name": "pushdata1-is-ambiguous",
+      "script": "6a4c285749544301020103ad2608134839e732280cb93bdd5b8682626dce5748a65c437a39cdcb680c2a82",
+      "error": "AMBIGUOUS_ENCODING"
+    },
+    {
+      "name": "reserved-refuel-opcode",
+      "script": "6a285749544301020203ad2608134839e732280cb93bdd5b8682626dce5748a65c437a39cdcb680c2a82",
+      "error": "INVALID_OPCODE"
+    },
+    {
+      "name": "zero-context-hash",
+      "script": "6a2857495443010201030000000000000000000000000000000000000000000000000000000000000000",
+      "error": "CONTEXT_HASH_ZERO"
+    }
+  ]
+}
