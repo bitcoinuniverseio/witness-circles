@@ -1,6 +1,6 @@
 # Acceptable Use, Creator Content, and Community Baseline
 
-**Draft requiring operator policy and legal review.**
+**Requires operator policy and legal review.**
 
 Users and creators must not use optional services to distribute malware, exploit material, unlawful personal data, credible threats, deceptive impersonation, intellectual-property infringement, or content prohibited by applicable law.
 

@@ -16,8 +16,8 @@ A Circle establishes exact output-key authorization only. It is not identity, at
 
 ## Availability and changes
 
-Experimental features can be paused for security, policy, maintenance, or legal reasons. Confirmed Bitcoin transactions remain subject to Bitcoin's best chain and are not erased by an application shutdown.
+Protocol services can be paused for security, policy, maintenance, or legal reasons. Confirmed Bitcoin transactions remain subject to Bitcoin's best chain and are not erased by an application shutdown.
 
 ## Warranty and liability
 
-Counsel must draft enforceable warranty, limitation, consumer-rights, dispute, governing-law, and termination provisions for each jurisdiction. No generated clause should be assumed enforceable.
+Counsel must prepare enforceable warranty, limitation, consumer-rights, dispute, governing-law, and termination provisions for each jurisdiction. No generated clause should be assumed enforceable.

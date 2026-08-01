@@ -1,6 +1,6 @@
 # Test Vectors
 
-`test-vectors/v1/golden-circle.json` contains a complete deterministic three-participant Signet transaction. It commits to:
+The [golden three-participant Signet vector](../../test-vectors/v1/golden-circle.json) contains a complete deterministic transaction. It commits to:
 
 - Canonical manifest and SHA-256 hash
 - Exact marker script

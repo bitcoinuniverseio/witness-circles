@@ -34,7 +34,7 @@ Do not treat active shards as exchange deposit identifiers or listable assets.
 
 ## Marketplaces
 
-There is no v1 marketplace integration. A safe platform should exclude active shards from listings and transaction builders. A read-only gallery may render confirmed Circles without prices or ownership claims.
+There is no marketplace integration. A safe platform should exclude active shards from listings and transaction builders. A read-only gallery may render confirmed Circles without prices or ownership claims.
 
 ## Coordinators
 

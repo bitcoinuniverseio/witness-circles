@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.bitcoinuniverse.dev/witc/v1/state-lifecycle.schema.json",
-  "title": "Witness Circles v1 state lifecycle vector",
+  "title": "Witness Circles state lifecycle vector",
   "type": "object",
   "additionalProperties": false,
   "required": [

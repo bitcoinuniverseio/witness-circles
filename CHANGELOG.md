@@ -6,7 +6,7 @@ All notable changes are documented here. Versions follow Semantic Versioning whi
 
 ### Added
 
-- Complete draft v1 `CIRCLE` specification
+- Complete final `CIRCLE` protocol specification
 - Exact marker and RFC 8785 manifest utilities
 - Strict Bitcoin transaction codec with minimal CompactSize enforcement
 - BIP341 key-path sighash and BIP340 signature verification

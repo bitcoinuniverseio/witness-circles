@@ -1,16 +1,16 @@
 # Security Policy
 
-## Experimental status
+## Protocol status
 
-Witness Circles v1 has not been represented as safe for unrestricted mainnet use. The package provides deterministic parsing, BIP341 signature verification, wallet intent inspection, and test vectors, but those controls do not replace independent review, Bitcoin Core policy preflight, hardware-wallet testing, or operational monitoring.
+Witness Circles is finalized as a protocol but is not represented as safe for unrestricted mainnet use. The package provides deterministic parsing, BIP341 signature verification, wallet intent inspection, and test vectors, but those controls do not replace independent review, Bitcoin Core policy preflight, hardware-wallet testing, or operational monitoring.
 
 ## Supported versions
 
 | Version | Status |
 |---|---|
-| 0.1.x | Security fixes accepted while the v1 specification is draft |
+| Final protocol | Security fixes accepted for the final specification |
 
-No version is currently designated as a production mainnet release.
+The final protocol is not designated for unrestricted mainnet creation.
 
 ## Private reporting
 
@@ -62,7 +62,7 @@ These are operational targets, not guarantees:
 - Optional manifests can contain malicious content. Treat them as untrusted and render as text after sanitization.
 - Relay and miner policy vary. Preflight does not guarantee confirmation.
 - Key loss is not recoverable by this protocol.
-- No marketplace is part of v1. Private key or account sales can still occur outside the protocol.
+- No marketplace is part of the protocol. Private key or account sales can still occur outside the protocol.
 
 ## Dependency and release controls
 
