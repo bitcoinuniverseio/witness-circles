@@ -60,6 +60,7 @@ describe("SDK facade and JSON interchange", () => {
           ownedOutpoint: first,
           expectedContextHash: vector.contextHash,
           maximumFeeShare: 2_000n,
+          maximumTotalFee: 4_000n,
           maximumFeeRateSatsPerVbyte: 10n,
         },
       ),

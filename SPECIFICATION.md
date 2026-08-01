@@ -81,7 +81,7 @@ Required fields are `protocol`, `version`, `kind`, `nonce`, `title`, `created`, 
 
 Aliases are untrusted labels. Applications MUST escape them and MUST NOT interpret them as identities.
 
-Schema string limits count Unicode code points, matching JSON Schema 2020-12. Every string MUST contain well-formed Unicode without unpaired surrogates. `created` and `expires` MUST be real RFC 3339 UTC timestamps ending in `Z`, and `expires` MUST be later than `created`. Alias keys MUST be 32 bytes of lowercase hex and MUST be unique within the manifest. These semantic rules are enforced by the reference validator in addition to the published structural schema.
+Schema string limits count Unicode code points, matching JSON Schema 2020-12. Every string MUST contain well-formed Unicode without unpaired surrogates. It MUST be unchanged by the ECMAScript `TrimString` operation used by `String.prototype.trim`, so leading or trailing ECMAScript whitespace is invalid. RFC 8785 preserves string code points without Unicode normalization. `created` and `expires` MUST be real RFC 3339 UTC timestamps ending in `Z`, and `expires` MUST be later than `created`. Alias keys MUST be 32 bytes of lowercase hex and MUST be unique within the manifest. These semantic rules are enforced by the reference validator in addition to the published structural schema.
 
 ## 6. Canonical transaction grammar
 
@@ -165,7 +165,7 @@ The transaction signals opt-in RBF. Any replacement needs new signatures from ev
 
 An indexer MUST store block hashes and sufficient undo information. When the indexed tip no longer matches Bitcoin Core, it MUST reverse confirmed transitions in reverse transaction order until the common ancestor, then ingest the new branch in canonical transaction order.
 
-Invalid candidates MUST NOT mutate state. A transaction spending an active shard that ceases to be a valid Circle after parser correction is treated as an ordinary lineage-closing spend under the parser version selected for that replay.
+Invalid candidate fields MUST NOT apply a Circle transition. A confirmed transaction that spends an active v1 shard but is not a valid v1 Circle still closes that lineage as an ordinary spend. This includes a transaction that ceases to be a valid Circle after parser correction under the parser version selected for replay.
 
 ## 11. Determinism and errors
 
@@ -173,11 +173,25 @@ CompactSize integers MUST be minimally encoded. Numeric calculations MUST use ch
 
 Independent implementations MUST reproduce the committed vectors in `test-vectors/v1/`. Error strings may differ, but the published error codes and valid or invalid result must agree.
 
+The canonical confirmed-state snapshot is the exact object defined by `schemas/v1/state-snapshot.schema.json`. `revision` starts at zero and increments once for each confirmed transaction that either applies a valid Circle or closes at least one active lineage through an ordinary spend. It does not increment for unrelated transactions or invalid candidates that close no active v1 lineage. Rollback restores the prior revision.
+
+Every JSON numeric field in the snapshot MUST be a nonnegative ECMAScript safe integer, except `circleCount`, which MUST also be at least one. Every display outpoint MUST use lowercase txid hex and a canonical decimal `vout` from 0 through 4294967295. Every satoshi string MUST be canonical unsigned decimal from zero through Bitcoin `MAX_MONEY`.
+
+Before hashing, implementations MUST order lowercase ASCII fields as follows:
+
+- `lineages` by `lineageId`.
+- `shards` by the complete display outpoint string, using ordinal byte order.
+- `circles` by `blockHeight`, then `transactionIndex`, then `txid`.
+- Each Circle's `members` by numeric `slot`.
+- `edges` by `toCircle`, then `lineageId`.
+
+No implementation-specific database fields may enter this snapshot. The canonical state hash is `SHA256(UTF8(RFC8785(snapshot)))`, with no prefix or trailing newline. The empty-state hash is `90e749b7720fac379610d979e29998c7d650150548622f0a47d9d3e181f1be52`. The golden transaction vector commits the first-transition state hash and block envelope. The state-lifecycle vector then commits a continuation, an ordinary-spend closure, and each reverse rollback root so independent indexers can reproduce the complete lifecycle exactly.
+
 ## 12. Upgrade policy
 
 New protocol behavior requires a new version byte, a specification, threat model, schemas, cross-language vectors, activation policy, and independent implementation review. Implementations MUST NOT reinterpret v1 history under a later version.
 
-Unknown versions and operations MAY be retained as uninterpreted candidates but MUST NOT mutate v1 state.
+Unknown versions and operations MAY be retained as uninterpreted candidates but MUST NOT apply their version-specific transitions to v1 state. If such a transaction spends an active v1 shard, the v1 lineage still closes under the ordinary-spend rule in section 8.
 
 ## 13. Wallet requirements
 

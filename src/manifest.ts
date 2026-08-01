@@ -52,6 +52,11 @@ function assertBoundedString(
 ): asserts value is string {
   invariant(typeof value === "string", "INVALID_CONTEXT_MANIFEST", `${field} must be a string`);
   assertValidUnicode(value);
+  invariant(
+    value.trim() === value,
+    "INVALID_CONTEXT_MANIFEST",
+    `${field} must not have leading or trailing whitespace`,
+  );
   const codePoints = [...value].length;
   invariant(
     codePoints >= minimum && codePoints <= maximum,

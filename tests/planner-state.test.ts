@@ -3,8 +3,10 @@ import {
   bytesToHex,
   type CircleContextManifest,
   type CirclePrevout,
+  deriveLineageId,
   estimateCircleVsize,
   hashWitnessState,
+  MAX_MONEY_SATS,
   outpointKey,
   toCirclePsbtPlan,
   validateCircle,
@@ -15,50 +17,173 @@ import { goldenContext, loadGolden, privateKey, signTransaction } from "./fixtur
 
 describe("planner and state engine", () => {
   it("keeps state ordering and hashes independent of the host locale", () => {
-    const low = "aa".repeat(32);
-    const high = "ff".repeat(32);
+    const firstCircleTxid = "aa".repeat(32);
+    const secondCircleTxid = "ff".repeat(32);
+    const genesisA = { txid: "11".repeat(32), vout: 0 };
+    const genesisB = { txid: "22".repeat(32), vout: 0 };
+    const genesisC = { txid: "33".repeat(32), vout: 0 };
+    const lineageA = deriveLineageId(genesisA);
+    const lineageB = deriveLineageId(genesisB);
+    const lineageC = deriveLineageId(genesisC);
+    const scriptA = `5120${"01".repeat(32)}`;
+    const scriptB = `5120${"02".repeat(32)}`;
+    const scriptC = `5120${"03".repeat(32)}`;
     const snapshot: WitnessStateSnapshot = {
       protocol: "witc",
       version: 1,
       revision: 2,
-      lineages: [high, low].map((lineageId) => ({
-        lineageId,
-        genesisOutpoint: `${lineageId}:0`,
-        currentOutpoint: `${lineageId}:1`,
-        status: "active",
-        firstHeight: 1,
-        lastHeight: 2,
-        circleCount: 1,
-        closedByTxid: null,
-      })),
-      shards: [high, low].map((txid) => ({
-        outpoint: `${txid}:1`,
-        lineageId: txid,
-        scriptPubKey: `5120${txid}`,
-        valueSats: "1000",
-        createdByCircle: txid,
-        previousOutpoint: `${txid}:0`,
-        createdHeight: 2,
-        spentByTxid: null,
-        spentHeight: null,
-      })),
-      circles: [high, low].map((txid) => ({
-        txid,
-        wtxid: txid,
-        contextHash: txid,
-        participantCount: 2,
-        feeSats: "200",
-        blockHeight: 2,
-        blockHash: high,
-        transactionIndex: 0,
-        members: [],
-      })),
-      edges: [high, low].map((toCircle) => ({
-        fromCircle: low,
-        toCircle,
-        lineageId: toCircle,
-        viaOutpoint: `${toCircle}:1`,
-      })),
+      lineages: [
+        {
+          lineageId: lineageC,
+          genesisOutpoint: outpointKey(genesisC),
+          currentOutpoint: `${secondCircleTxid}:1`,
+          status: "active",
+          firstHeight: 2,
+          lastHeight: 2,
+          circleCount: 1,
+          closedByTxid: null,
+        },
+        {
+          lineageId: lineageB,
+          genesisOutpoint: outpointKey(genesisB),
+          currentOutpoint: `${firstCircleTxid}:2`,
+          status: "active",
+          firstHeight: 1,
+          lastHeight: 1,
+          circleCount: 1,
+          closedByTxid: null,
+        },
+        {
+          lineageId: lineageA,
+          genesisOutpoint: outpointKey(genesisA),
+          currentOutpoint: `${secondCircleTxid}:2`,
+          status: "active",
+          firstHeight: 1,
+          lastHeight: 2,
+          circleCount: 2,
+          closedByTxid: null,
+        },
+      ],
+      shards: [
+        {
+          outpoint: `${secondCircleTxid}:2`,
+          lineageId: lineageA,
+          scriptPubKey: scriptA,
+          valueSats: "1900",
+          createdByCircle: secondCircleTxid,
+          previousOutpoint: `${firstCircleTxid}:1`,
+          createdHeight: 2,
+          spentByTxid: null,
+          spentHeight: null,
+        },
+        {
+          outpoint: `${secondCircleTxid}:1`,
+          lineageId: lineageC,
+          scriptPubKey: scriptC,
+          valueSats: "2000",
+          createdByCircle: secondCircleTxid,
+          previousOutpoint: outpointKey(genesisC),
+          createdHeight: 2,
+          spentByTxid: null,
+          spentHeight: null,
+        },
+        {
+          outpoint: `${firstCircleTxid}:2`,
+          lineageId: lineageB,
+          scriptPubKey: scriptB,
+          valueSats: "2000",
+          createdByCircle: firstCircleTxid,
+          previousOutpoint: outpointKey(genesisB),
+          createdHeight: 1,
+          spentByTxid: null,
+          spentHeight: null,
+        },
+        {
+          outpoint: `${firstCircleTxid}:1`,
+          lineageId: lineageA,
+          scriptPubKey: scriptA,
+          valueSats: "2000",
+          createdByCircle: firstCircleTxid,
+          previousOutpoint: outpointKey(genesisA),
+          createdHeight: 1,
+          spentByTxid: secondCircleTxid,
+          spentHeight: 2,
+        },
+      ],
+      circles: [
+        {
+          txid: secondCircleTxid,
+          wtxid: "77".repeat(32),
+          contextHash: "55".repeat(32),
+          participantCount: 2,
+          feeSats: "200",
+          blockHeight: 2,
+          blockHash: "dd".repeat(32),
+          transactionIndex: 0,
+          members: [
+            {
+              slot: 1,
+              lineageId: lineageA,
+              inputOutpoint: `${firstCircleTxid}:1`,
+              outputOutpoint: `${secondCircleTxid}:2`,
+              inputValueSats: "2000",
+              outputValueSats: "1900",
+              feeShareSats: "100",
+              wasExistingLineage: true,
+            },
+            {
+              slot: 0,
+              lineageId: lineageC,
+              inputOutpoint: outpointKey(genesisC),
+              outputOutpoint: `${secondCircleTxid}:1`,
+              inputValueSats: "2100",
+              outputValueSats: "2000",
+              feeShareSats: "100",
+              wasExistingLineage: false,
+            },
+          ],
+        },
+        {
+          txid: firstCircleTxid,
+          wtxid: "66".repeat(32),
+          contextHash: "44".repeat(32),
+          participantCount: 2,
+          feeSats: "200",
+          blockHeight: 1,
+          blockHash: "cc".repeat(32),
+          transactionIndex: 0,
+          members: [
+            {
+              slot: 1,
+              lineageId: lineageB,
+              inputOutpoint: outpointKey(genesisB),
+              outputOutpoint: `${firstCircleTxid}:2`,
+              inputValueSats: "2100",
+              outputValueSats: "2000",
+              feeShareSats: "100",
+              wasExistingLineage: false,
+            },
+            {
+              slot: 0,
+              lineageId: lineageA,
+              inputOutpoint: outpointKey(genesisA),
+              outputOutpoint: `${firstCircleTxid}:1`,
+              inputValueSats: "2100",
+              outputValueSats: "2000",
+              feeShareSats: "100",
+              wasExistingLineage: false,
+            },
+          ],
+        },
+      ],
+      edges: [
+        {
+          fromCircle: firstCircleTxid,
+          toCircle: secondCircleTxid,
+          lineageId: lineageA,
+          viaOutpoint: `${firstCircleTxid}:1`,
+        },
+      ],
     };
     const baselineHash = hashWitnessState(snapshot);
     const originalLocaleCompare = String.prototype.localeCompare;
@@ -75,8 +200,125 @@ describe("planner and state engine", () => {
     } finally {
       String.prototype.localeCompare = originalLocaleCompare;
     }
-    expect(localizedOrder).toEqual([low, high]);
+    expect(localizedOrder).toEqual([lineageA, lineageB, lineageC].sort());
     expect(localizedHash).toBe(baselineHash);
+  });
+
+  it("rejects noncanonical numeric state before hashing", () => {
+    const empty = new WitnessStateEngine().snapshot();
+    expect(() => hashWitnessState({ ...empty, revision: Number.MAX_SAFE_INTEGER + 1 })).toThrow(
+      /safe integer/,
+    );
+    const shard = {
+      outpoint: `${"aa".repeat(32)}:0`,
+      lineageId: "bb".repeat(32),
+      scriptPubKey: `5120${"cc".repeat(32)}`,
+      valueSats: "1000",
+      createdByCircle: "dd".repeat(32),
+      previousOutpoint: `${"ee".repeat(32)}:0`,
+      createdHeight: 1,
+      spentByTxid: null,
+      spentHeight: null,
+    };
+    expect(() =>
+      hashWitnessState({
+        ...empty,
+        shards: [{ ...shard, outpoint: `${"aa".repeat(32)}:4294967296` }],
+      }),
+    ).toThrow(/uint32 outpoint/);
+    expect(() =>
+      hashWitnessState({ ...empty, shards: [{ ...shard, valueSats: "2100000000000001" }] }),
+    ).toThrow(/MAX_MONEY/);
+  });
+
+  it("rejects duplicate, dangling, and status-inconsistent state snapshots", () => {
+    const { validated } = goldenContext();
+    const engine = new WitnessStateEngine();
+    engine.apply({
+      txid: validated.txid,
+      spentOutpoints: validated.members.map((member) => member.input),
+      blockHeight: 200,
+      blockHash: "aa".repeat(32),
+      transactionIndex: 4,
+      circle: validated,
+    });
+    const snapshot = engine.snapshot();
+    const lineage = snapshot.lineages[0];
+    const circle = snapshot.circles[0];
+    if (lineage === undefined || lineage.currentOutpoint === null || circle === undefined) {
+      throw new Error("Expected a complete first-Circle snapshot");
+    }
+    const currentOutpoint = lineage.currentOutpoint;
+
+    expect(
+      () =>
+        new WitnessStateEngine({
+          ...snapshot,
+          databaseId: "must-not-be-hashed",
+        } as WitnessStateSnapshot),
+    ).toThrow(/exactly the protocol-defined fields/);
+    expect(
+      () =>
+        new WitnessStateEngine({
+          ...snapshot,
+          shards: snapshot.shards.map((shard, index) =>
+            index === 0 ? { ...shard, valueSats: 1_000 as never } : shard,
+          ),
+        }),
+    ).toThrow(/canonical decimal satoshis/);
+    expect(
+      () =>
+        new WitnessStateEngine({
+          ...snapshot,
+          lineages: [...snapshot.lineages, lineage],
+        }),
+    ).toThrow(/Lineage id must be unique/);
+    expect(
+      () =>
+        new WitnessStateEngine({
+          ...snapshot,
+          lineages: snapshot.lineages.map((candidate) =>
+            candidate.lineageId === lineage.lineageId
+              ? { ...candidate, currentOutpoint: null }
+              : candidate,
+          ),
+        }),
+    ).toThrow(/Active lineage must have a current outpoint/);
+    expect(
+      () =>
+        new WitnessStateEngine({
+          ...snapshot,
+          shards: snapshot.shards.filter((shard) => shard.outpoint !== currentOutpoint),
+        }),
+    ).toThrow(/successor shard|shard count|current shard/i);
+    expect(
+      () =>
+        new WitnessStateEngine({
+          ...snapshot,
+          circles: [
+            {
+              ...circle,
+              members: circle.members.map((member, index) =>
+                index === 1 ? { ...member, slot: 0 } : member,
+              ),
+            },
+          ],
+        }),
+    ).toThrow(/slots must be contiguous/);
+    expect(
+      () =>
+        new WitnessStateEngine({
+          ...snapshot,
+          edges: [
+            {
+              fromCircle: circle.txid,
+              toCircle: circle.txid,
+              lineageId: lineage.lineageId,
+              viaOutpoint: currentOutpoint,
+            },
+          ],
+        }),
+    ).toThrow(/edge does not match/);
   });
 
   it("uses the exact vsize formula", () => {
@@ -122,7 +364,48 @@ describe("planner and state engine", () => {
     });
   });
 
+  it("rejects nonintegral positions and aggregate values above MAX_MONEY", () => {
+    const vector = loadGolden();
+    const participants = vector.prevouts.slice(0, 2).map((prevout) => ({
+      txid: prevout.txid,
+      vout: prevout.vout,
+      value: MAX_MONEY_SATS / 2n + 1n,
+      scriptPubKey: Uint8Array.from(Buffer.from(prevout.scriptPubKey, "hex")),
+      blockHeight: prevout.blockHeight,
+      maximumFeeShare: 2_000n,
+    }));
+    const request = {
+      network: "signet" as const,
+      manifest: vector.manifest as never,
+      participants,
+      feeRateSatsPerVbyte: 1n,
+    };
+
+    expect(() => buildCirclePlan(request)).toThrow(/MAX_MONEY/);
+    expect(() =>
+      buildCirclePlan({
+        ...request,
+        participants: participants.map((participant, index) => ({
+          ...participant,
+          value: 30_000n,
+          blockHeight: index === 0 ? 199.5 : participant.blockHeight,
+        })),
+      }),
+    ).toThrow(/confirmed/);
+    expect(() =>
+      buildCirclePlan({
+        ...request,
+        participants: participants.map((participant, index) => ({
+          ...participant,
+          value: 30_000n,
+          vout: index === 0 ? 0.5 : participant.vout,
+        })),
+      }),
+    ).toThrow(/32-bit unsigned integer/);
+  });
+
   it("applies, closes, and rolls back deterministic lineage state", () => {
+    const vector = loadGolden();
     const { validated } = goldenContext();
     const engine = new WitnessStateEngine();
     const initialHash = engine.stateHash();
@@ -135,6 +418,7 @@ describe("planner and state engine", () => {
       circle: validated,
     });
     expect(applied.kind).toBe("circle");
+    expect(applied.stateHash).toBe(vector.stateTransition.expectedStateHash);
     expect(applied.createdLineages).toHaveLength(3);
     expect(engine.snapshot()).toMatchObject({ revision: 1 });
     expect(engine.snapshot().lineages.every((lineage) => lineage.status === "active")).toBe(true);
@@ -158,6 +442,38 @@ describe("planner and state engine", () => {
     expect(engine.snapshot().lineages.every((lineage) => lineage.status === "active")).toBe(true);
     engine.rollbackLast(validated.txid);
     expect(engine.stateHash()).toBe(initialHash);
+  });
+
+  it("keeps apply and rollback failure-atomic", () => {
+    const { validated } = goldenContext();
+    const event = {
+      txid: validated.txid,
+      spentOutpoints: validated.members.map((member) => member.input),
+      blockHeight: 200,
+      blockHash: "aa".repeat(32),
+      transactionIndex: 4,
+      circle: validated,
+    } as const;
+    const engine = new WitnessStateEngine();
+    const initialHash = engine.stateHash();
+
+    expect(() => engine.apply({ ...event, transactionIndex: Number.MAX_SAFE_INTEGER + 1 })).toThrow(
+      /safe integer/,
+    );
+    expect(engine.stateHash()).toBe(initialHash);
+    expect(() => engine.rollbackLast()).toThrow(/No transition/);
+
+    engine.apply(event);
+    const appliedHash = engine.stateHash();
+    expect(() => engine.apply(event)).toThrow(/already exists/);
+    expect(engine.stateHash()).toBe(appliedHash);
+
+    const wrongTxid = "ff".repeat(32);
+    expect(() => engine.rollbackLast(wrongTxid)).toThrow(/does not match/);
+    expect(engine.stateHash()).toBe(appliedHash);
+    expect(engine.rollbackLast(validated.txid)).toBe(initialHash);
+    expect(engine.stateHash()).toBe(initialHash);
+    expect(() => engine.rollbackLast()).toThrow(/No transition/);
   });
 
   it("continues active lineages and records Circle edges", () => {

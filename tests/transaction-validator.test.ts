@@ -22,6 +22,7 @@ describe("transaction codec and validator", () => {
       name: vector.name,
       txid: vector.txid,
       participantCount: 3,
+      stateHash: vector.stateTransition.expectedStateHash,
     });
   });
 
@@ -133,6 +134,7 @@ describe("transaction codec and validator", () => {
         ownedOutpoint: ownedPrevout,
         expectedContextHash: vector.contextHash,
         maximumFeeShare: 2_000n,
+        maximumTotalFee: 4_000n,
         maximumFeeRateSatsPerVbyte: 10n,
       },
     );
@@ -142,5 +144,18 @@ describe("transaction codec and validator", () => {
       feeShareSats: "1210",
       totalFeeSats: "3630",
     });
+    expect(() =>
+      inspectUnsignedSigningIntent(
+        bytesToHex(encodeTransaction(unsigned, false)),
+        { network: "signet", currentBlockHeight: 200, prevouts },
+        {
+          ownedOutpoint: ownedPrevout,
+          expectedContextHash: vector.contextHash,
+          maximumFeeShare: 2_000n,
+          maximumTotalFee: 3_629n,
+          maximumFeeRateSatsPerVbyte: 10n,
+        },
+      ),
+    ).toThrow(/total fee/);
   });
 });

@@ -14,7 +14,7 @@ All notable changes are documented here. Versions follow Semantic Versioning whi
 - Transaction and PSBT planning model
 - Wallet signing-intent inspector
 - Rollback-capable reference lineage state engine
-- SDK, CLI, versioned schemas, golden signed transaction, and tests
+- SDK, CLI, versioned schemas, golden signed transaction, state-lifecycle vector, and tests
 - User, creator, developer, operator, commercial, launch, security, governance, and legal-review documentation
 - Static commercial and documentation website
 - CI, container, security-header, and configuration examples
@@ -22,6 +22,9 @@ All notable changes are documented here. Versions follow Semantic Versioning whi
 ### Fixed
 
 - Aligned manifest runtime validation with JSON Schema code-point limits, exact UTC timestamps, well-formed Unicode, and lowercase alias keys
+- Defined the canonical state-root preimage and committed a reproducible golden transition hash
+- Rejected nonintegral planner positions, whitespace-padded manifest text, and aggregate inputs above Bitcoin MAX_MONEY
+- Rejected unsafe state integers, outpoint indices above uint32, and state amounts above Bitcoin MAX_MONEY before hashing
 
 ### Deliberate exclusions
 

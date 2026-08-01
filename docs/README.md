@@ -31,8 +31,6 @@ Choose the shortest path that matches your role.
 - [Accessible litepaper](commercial/litepaper.md)
 - [Protocol one-pager](commercial/one-pager.md)
 - [Partner integrations](commercial/partners.md)
-- [Launch kit](launch/launch-kit.md)
-- [Crisis communication](launch/crisis-comms.md)
 - [Responsible marketing](launch/responsible-marketing.md)
 
 ## Legal-review drafts

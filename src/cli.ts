@@ -15,7 +15,12 @@ import {
   witnessTransactionId,
 } from "./transaction.js";
 import { type CirclePrevout, validateCircle } from "./validator.js";
-import { type GoldenCircleVector, verifyGoldenCircleVector } from "./vectors.js";
+import {
+  type GoldenCircleVector,
+  type StateLifecycleVector,
+  verifyGoldenCircleVector,
+  verifyStateLifecycleVector,
+} from "./vectors.js";
 
 function help(): string {
   return `Witness Circles reference CLI
@@ -27,7 +32,7 @@ Usage:
   witc tx decode <raw-transaction-hex>
   witc plan <request.json>
   witc validate --tx <raw.hex|json> --prevouts <prevouts.json> --height <n> --network <network> [--unsigned]
-  witc vectors verify [golden-circle.json]
+  witc vectors verify [golden-circle.json] [state-lifecycle.json]
 
 Networks: mainnet, testnet3, signet, regtest
 Validation verifies signatures unless --unsigned is present.`;
@@ -139,15 +144,20 @@ async function run(args: readonly string[]): Promise<unknown> {
     });
   }
   if (group === "vectors" && command === "verify") {
-    const defaultPath = resolve(
+    const defaultDirectory = resolve(
       dirname(fileURLToPath(import.meta.url)),
       "..",
       "test-vectors",
       "v1",
-      "golden-circle.json",
     );
-    const vector = (await readJson(positional ?? defaultPath)) as GoldenCircleVector;
-    return verifyGoldenCircleVector(vector);
+    const goldenPath = positional ?? resolve(defaultDirectory, "golden-circle.json");
+    const lifecyclePath = args[3] ?? resolve(dirname(goldenPath), "state-lifecycle.json");
+    const golden = (await readJson(goldenPath)) as GoldenCircleVector;
+    const lifecycle = (await readJson(lifecyclePath)) as StateLifecycleVector;
+    return {
+      golden: verifyGoldenCircleVector(golden),
+      lifecycle: verifyStateLifecycleVector(lifecycle, golden),
+    };
   }
   throw new Error(`Unknown command\n\n${help()}`);
 }

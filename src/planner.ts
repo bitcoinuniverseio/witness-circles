@@ -1,5 +1,6 @@
 import { bytesToHex, hexToBytes } from "./bytes.js";
 import {
+  MAX_MONEY_SATS,
   MIN_SUCCESSOR_VALUE_SATS,
   REQUIRED_LOCK_TIME,
   REQUIRED_SEQUENCE,
@@ -123,7 +124,15 @@ export function buildCirclePlan(request: CirclePlanRequest): CirclePlan {
   participants.sort(compareOutpoints);
   const seenOutpoints = new Set<string>();
   const seenScripts = new Set<string>();
+  let inputTotal = 0n;
   for (const participant of participants) {
+    invariant(
+      Number.isSafeInteger(participant.vout) &&
+        participant.vout >= 0 &&
+        participant.vout <= 0xffff_ffff,
+      "INVALID_OUTPOINT",
+      "Participant vout must be a 32-bit unsigned integer",
+    );
     const outpoint = `${participant.txid}:${participant.vout}`;
     invariant(
       !seenOutpoints.has(outpoint),
@@ -145,14 +154,25 @@ export function buildCirclePlan(request: CirclePlanRequest): CirclePlan {
     );
     seenScripts.add(script);
     invariant(
-      participant.blockHeight >= 0,
+      Number.isSafeInteger(participant.blockHeight) && participant.blockHeight >= 0,
       "PREVOUT_HEIGHT",
       "Participant input must be confirmed",
     );
     invariant(
-      participant.maximumFeeShare >= 0n,
+      participant.value >= 0n && participant.value <= MAX_MONEY_SATS,
+      "INTEGER_RANGE",
+      "Participant input value is outside the Bitcoin money range",
+    );
+    inputTotal += participant.value;
+    invariant(
+      inputTotal <= MAX_MONEY_SATS,
+      "INTEGER_RANGE",
+      "Circle input total exceeds MAX_MONEY",
+    );
+    invariant(
+      participant.maximumFeeShare >= 0n && participant.maximumFeeShare <= MAX_MONEY_SATS,
       "FEE_CAP_EXCEEDED",
-      "Maximum fee share cannot be negative",
+      "Maximum fee share is outside the Bitcoin money range",
     );
   }
   const canonicalManifest = canonicalizeContextManifest(manifest);
@@ -260,9 +280,12 @@ export function parseParticipantPlanJson(value: unknown): CircleParticipantPlanI
     "Participant txid must be a string",
   );
   invariant(
-    typeof record["vout"] === "number",
+    typeof record["vout"] === "number" &&
+      Number.isSafeInteger(record["vout"]) &&
+      record["vout"] >= 0 &&
+      record["vout"] <= 0xffff_ffff,
     "INVALID_OUTPOINT",
-    "Participant vout must be a number",
+    "Participant vout must be a 32-bit unsigned integer",
   );
   invariant(
     typeof record["valueSats"] === "string" && /^\d+$/.test(record["valueSats"]),
@@ -271,9 +294,11 @@ export function parseParticipantPlanJson(value: unknown): CircleParticipantPlanI
   );
   invariant(typeof record["scriptPubKey"] === "string", "INVALID_P2TR", "scriptPubKey must be hex");
   invariant(
-    typeof record["blockHeight"] === "number",
+    typeof record["blockHeight"] === "number" &&
+      Number.isSafeInteger(record["blockHeight"]) &&
+      record["blockHeight"] >= 0,
     "PREVOUT_HEIGHT",
-    "blockHeight must be a number",
+    "blockHeight must be a nonnegative safe integer",
   );
   invariant(
     typeof record["maximumFeeShareSats"] === "string" &&
