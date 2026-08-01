@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.bitcoinuniverse.dev/witc/v1/plan-request.schema.json",
-  "title": "Witness Circles v1 plan request",
+  "title": "Witness Circles plan request",
   "type": "object",
   "additionalProperties": false,
   "required": ["network", "manifest", "participants", "feeRateSatsPerVbyte"],

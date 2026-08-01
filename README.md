@@ -1,6 +1,6 @@
 # Witness Circles
 
-Witness Circles is an experimental Bitcoin protocol for creating one exact, jointly authorized transaction across 2 to 16 independent Taproot output keys.
+Witness Circles is the final Bitcoin protocol for creating one exact, jointly authorized transaction across 2 to 16 independent Taproot output keys.
 
 Each participant contributes a confirmed, dedicated native P2TR input. A valid Circle returns each participant's Bitcoin to the same output key minus a deterministic equal fee share and commits to a shared context hash in a 42-byte `OP_RETURN` output.
 
@@ -12,11 +12,11 @@ It does not prove identity, attendance, friendship, intent outside the transacti
 
 ## Status
 
-Version 1 is experimental. The reference implementation is suitable for parser interoperability, wallet safety review, regtest, and Signet testing. Planning and marker creation fail closed outside Signet and regtest. Mainnet and testnet3 identifiers remain parseable for read-only interoperability only.
+The final protocol is suitable for parser interoperability, wallet safety review, regtest, and Signet testing. Planning and marker creation fail closed outside Signet and regtest. Mainnet and testnet3 identifiers remain parseable for read-only interoperability only.
 
 Public source repository: [github.com/bitcoinuniverse/witness-circles](https://github.com/bitcoinuniverse/witness-circles)
 
-Version 1 supports only `CIRCLE`:
+The final protocol supports only `CIRCLE`:
 
 - No protocol transfer operation
 - No marketplace or transferable asset
@@ -97,13 +97,13 @@ Run `node dist/cli.js help` for complete usage.
 
 | Path | Purpose |
 |---|---|
-| `SPECIFICATION.md` | Normative v1 protocol rules |
+| `SPECIFICATION.md` | Normative final protocol rules |
 | `src/` | Reference codec, parser, validator, state engine, planner, SDK, and CLI |
-| `schemas/v1/` | Versioned JSON schemas for optional metadata and interchange |
-| `test-vectors/v1/` | Golden signed transaction, marker, and full state-lifecycle fixtures |
+| [`schemas`](schemas/v1/) | JSON schemas for optional metadata and interchange |
+| [`test vectors`](test-vectors/v1/) | Golden signed transaction, marker, and full state-lifecycle fixtures |
 | `tests/` | Unit, property, schema, signature, validator, and state tests |
-| `docs/` | User, creator, developer, operator, commercial, launch, and legal-review material |
-| `site/` | Static commercial and documentation website |
+| `docs/` | User, creator, developer, operator, and legal-review material |
+| `site/` | Static documentation website |
 | `ops/` | Static-site deployment and security-header configuration |
 
 ## Verification

@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.bitcoinuniverse.dev/witc/v1/marker.schema.json",
-  "title": "Decoded Witness Circles v1 marker",
+  "title": "Decoded Witness Circles marker",
   "type": "object",
   "additionalProperties": false,
   "required": [

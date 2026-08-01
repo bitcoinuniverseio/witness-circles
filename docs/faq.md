@@ -10,7 +10,7 @@ No. It proves that the listed output keys authorized one exact transaction. Keys
 
 ## Can the coordinator steal my Bitcoin?
 
-A malicious coordinator can stall or censor. It cannot redirect a correctly validated signature because every permitted v1 sighash commits to all inputs and outputs. A wallet that skips validation can still lose funds.
+A malicious coordinator can stall or censor. It cannot redirect a correctly validated signature because every permitted sighash commits to all inputs and outputs. A wallet that skips validation can still lose funds.
 
 ## Why return to the same key?
 
@@ -18,7 +18,7 @@ Exact script reuse makes continuation deterministic for independent indexers. It
 
 ## Can I transfer a lineage?
 
-Version 1 has no transfer operation. An ordinary spend remains valid Bitcoin but closes the lineage.
+The final protocol has no transfer operation. An ordinary spend remains valid Bitcoin but closes the lineage.
 
 ## Can I sell a Circle or shard?
 
@@ -30,11 +30,11 @@ Only a 32-byte hash is in the transaction. The canonical manifest can be private
 
 ## Why no CPFP?
 
-Version 1 has no shared anchor and requires confirmed inputs for new Circles. Coordinated RBF is the supported fee-bump model. CPFP may be researched separately but is not implied.
+The final protocol has no shared anchor and requires confirmed inputs for new Circles. Coordinated RBF is the supported fee-bump model. CPFP may be researched separately but is not implied.
 
 ## Is mainnet supported?
 
-The transaction grammar uses current Bitcoin primitives. This repository does not declare the current draft and wallet stack production ready for unrestricted mainnet creation.
+The transaction grammar uses current Bitcoin primitives. The final protocol and wallet stack are not designated for unrestricted mainnet creation.
 
 ## What happens during a reorganization?
 

@@ -1,6 +1,6 @@
 # Privacy and Retention Baseline for Legal Review
 
-**Draft for counsel and privacy review. Actual data mapping is required.**
+**Requires counsel and privacy review. Actual data mapping is required.**
 
 ## Public Bitcoin data
 

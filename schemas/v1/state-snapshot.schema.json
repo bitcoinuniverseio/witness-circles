@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.bitcoinuniverse.dev/witc/v1/state-snapshot.schema.json",
-  "title": "Witness Circles v1 canonical state snapshot",
+  "title": "Witness Circles canonical state snapshot",
   "$comment": "Arrays use the canonical order defined by SPECIFICATION.md. The state hash is SHA-256 of the UTF-8 RFC 8785 serialization of this exact object.",
   "type": "object",
   "additionalProperties": false,

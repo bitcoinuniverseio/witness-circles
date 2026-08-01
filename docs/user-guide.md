@@ -63,7 +63,7 @@ At 10 sat/vB, an eight-person Circle costs 8,660 sats, about 1,083 sats each. Yo
 - **Settled display:** six confirmations, an application convention only.
 - **Reorganized:** the confirming block left the best chain and state was rolled back.
 
-RBF requires everyone to sign again. Version 1 does not offer CPFP. Cancellation after broadcast is not reliable.
+RBF requires everyone to sign again. The final protocol does not offer CPFP. Cancellation after broadcast is not reliable.
 
 ## Continuing or closing a lineage
 
@@ -71,7 +71,7 @@ A confirmed Circle creates a successor shard controlled by the same Taproot key.
 
 Spending a shard in an ordinary transaction closes its lineage. The Bitcoin remains spendable, but future Circles cannot extend that historical path. A compliant wallet protects shards from automatic coin selection and asks for explicit closure confirmation.
 
-Version 1 has no protocol transfer or rekey. Moving control to another key closes the old lineage and can begin a new one later.
+The final protocol has no protocol transfer or rekey. Moving control to another key closes the old lineage and can begin a new one later.
 
 ## Recovery
 

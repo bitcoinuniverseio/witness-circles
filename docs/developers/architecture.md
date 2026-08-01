@@ -24,7 +24,7 @@ No coordinator or metadata service participates in protocol validity.
 |---|---|
 | `transaction.ts` | Strict wire codec, IDs, vsize, outpoint order, P2TR recognition |
 | `marker.ts` | Exact `WITC` payload and script encoding |
-| `manifest.ts` and `jcs.ts` | v1 manifest validation, RFC 8785 serialization, SHA-256 commitment |
+| `manifest.ts` and `jcs.ts` | Manifest validation, RFC 8785 serialization, SHA-256 commitment |
 | `taproot.ts` | BIP341 key-path sighash and BIP340 verification |
 | `validator.ts` | Structural, fee, witness, prevout, network, and signature rules |
 | `planner.ts` | Canonical unsigned transaction and signer-minimized PSBT planning data |

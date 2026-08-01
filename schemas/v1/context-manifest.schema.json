@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.bitcoinuniverse.dev/witc/v1/context-manifest.schema.json",
-  "title": "Witness Circles v1 context manifest",
+  "title": "Witness Circles context manifest",
   "$comment": "String limits count Unicode code points. Semantic validation also requires well-formed Unicode, strings unchanged by ECMAScript TrimString, no Unicode normalization before JCS, real UTC calendar timestamps, expires later than created, and unique alias keys.",
   "type": "object",
   "additionalProperties": false,

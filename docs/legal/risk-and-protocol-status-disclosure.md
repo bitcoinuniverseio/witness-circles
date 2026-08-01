@@ -1,8 +1,8 @@
 # Risk and Protocol-Status Disclosure
 
-**Draft for qualified legal, security, and product review.**
+**Requires qualified legal, security, and product review.**
 
-Witness Circles is experimental technology. Risks include:
+Witness Circles has material operational and user risks:
 
 - Permanent public linkage among participant inputs and same-key successors
 - Bitcoin fee volatility and failed or delayed confirmation
@@ -15,6 +15,6 @@ Witness Circles is experimental technology. Risks include:
 - Regulatory or platform treatment that differs by jurisdiction
 - Application or service shutdown
 
-No token, market, return, appreciation, yield, royalty, attendance proof, identity proof, custody, or recovery service is created by protocol v1.
+No token, market, return, appreciation, yield, royalty, attendance proof, identity proof, custody, or recovery service is created by the protocol.
 
 Users should test with regtest or Signet, use dedicated inputs, review every output and fee, preserve wallet backups, and obtain independent advice where consequences are material.

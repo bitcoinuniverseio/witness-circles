@@ -1,17 +1,17 @@
 # Witness Circles Protocol Specification
 
-Version: 1.0.0-draft.1
+Version: 1.0.0
 
 Protocol magic: `WITC`
 
 Operation: `CIRCLE` (`0x01`)
-Status: experimental draft
+Status: final
 
 The key words MUST, MUST NOT, REQUIRED, SHALL, SHALL NOT, SHOULD, SHOULD NOT, RECOMMENDED, NOT RECOMMENDED, MAY, and OPTIONAL are interpreted as described by RFC 2119 and RFC 8174 when written in uppercase.
 
 ## 1. Claim boundary
 
-A valid v1 Circle establishes only that distinct native P2TR output keys authorized the exact transaction under Bitcoin's Taproot key-path signature rules.
+A valid Circle establishes only that distinct native P2TR output keys authorized the exact transaction under Bitcoin's Taproot key-path signature rules.
 
 A compliant application MUST NOT present a Circle as proof of:
 
@@ -38,7 +38,7 @@ A compliant application MUST NOT present a Circle as proof of:
 | `0x02` | Bitcoin Signet |
 | `0x03` | Bitcoin regtest |
 
-Other values are invalid for v1. The marker network MUST match the chain being indexed.
+Other values are invalid for the protocol. The marker network MUST match the chain being indexed.
 
 ## 4. Marker
 
@@ -65,7 +65,7 @@ The byte serialization is:
 | 7 | 1 | Participant count `N` |
 | 8 | 32 | SHA-256 context-manifest hash |
 
-`N` MUST be 2 through 16 inclusive. Only operation `0x01 CIRCLE` is valid in v1. Reserved values, including potential refuel or rekey operations, MUST be rejected rather than guessed.
+`N` MUST be 2 through 16 inclusive. Only operation `0x01 CIRCLE` is valid in the protocol. Reserved values, including potential refuel or rekey operations, MUST be rejected rather than guessed.
 
 ## 5. Context manifest
 
@@ -75,9 +75,9 @@ The context manifest is JSON canonicalized with RFC 8785 JSON Canonicalization S
 context_hash = SHA256(UTF8(JCS(manifest)))
 ```
 
-Required fields are `protocol`, `version`, `kind`, `nonce`, `title`, `created`, and `expires`. The versioned schema is `schemas/v1/context-manifest.schema.json`.
+Required fields are `protocol`, `version`, `kind`, `nonce`, `title`, `created`, and `expires`. The [context-manifest schema](schemas/v1/context-manifest.schema.json) defines their structure.
 
-`expires` applies to the invitation only. It does not expire a confirmed Circle. Unknown v1 fields are rejected by the reference manifest validator. A manifest MAY remain private or disappear. Its absence MUST NOT invalidate a matching on-chain Circle.
+`expires` applies to the invitation only. It does not expire a confirmed Circle. Unknown manifest fields are rejected by the reference validator. A manifest MAY remain private or disappear. Its absence MUST NOT invalidate a matching on-chain Circle.
 
 Aliases are untrusted labels. Applications MUST escape them and MUST NOT interpret them as identities.
 
@@ -85,7 +85,7 @@ Schema string limits count Unicode code points, matching JSON Schema 2020-12. Ev
 
 ## 6. Canonical transaction grammar
 
-A valid v1 Circle MUST satisfy every rule:
+A valid Circle MUST satisfy every rule:
 
 1. `nVersion` is 2.
 2. `nLockTime` is 0.
@@ -149,9 +149,9 @@ The outpoint uses Bitcoin wire form: reversed display txid bytes followed by fou
 
 Each Circle creates one successor shard for each lineage. A valid later Circle can spend a current shard and create its next same-script successor. Multiple lineages participate together but never merge ownership or value.
 
-A consensus-valid transaction that spends an active shard without satisfying every v1 Circle rule closes that lineage. The Bitcoin is not burned by the protocol. Historical Circles remain part of the best-chain record.
+A consensus-valid transaction that spends an active shard without satisfying every Circle rule closes that lineage. The Bitcoin is not burned by the protocol. Historical Circles remain part of the best-chain record.
 
-Version 1 has no transfer, split, merge, rekey, refuel, mint, market, burn, reward, governance, or administrative operation.
+The final protocol has no transfer, split, merge, rekey, refuel, mint, market, burn, reward, governance, or administrative operation.
 
 ## 9. Confirmation and mempool
 
@@ -159,21 +159,21 @@ Mempool observations are provisional and node-local. An indexer MAY expose pendi
 
 A Circle becomes canonical at one confirmation in the best chain. Applications MAY label six confirmations as settled display state, but this is not an additional protocol transition.
 
-The transaction signals opt-in RBF. Any replacement needs new signatures from every participant because signatures commit to all inputs and outputs. A v1 product MUST NOT promise CPFP, cancellation after broadcast, or successful relay.
+The transaction signals opt-in RBF. Any replacement needs new signatures from every participant because signatures commit to all inputs and outputs. A compliant product MUST NOT promise CPFP, cancellation after broadcast, or successful relay.
 
 ## 10. Reorganizations
 
 An indexer MUST store block hashes and sufficient undo information. When the indexed tip no longer matches Bitcoin Core, it MUST reverse confirmed transitions in reverse transaction order until the common ancestor, then ingest the new branch in canonical transaction order.
 
-Invalid candidate fields MUST NOT apply a Circle transition. A confirmed transaction that spends an active v1 shard but is not a valid v1 Circle still closes that lineage as an ordinary spend. This includes a transaction that ceases to be a valid Circle after parser correction under the parser version selected for replay.
+Invalid candidate fields MUST NOT apply a Circle transition. A confirmed transaction that spends an active shard but is not a valid Circle still closes that lineage as an ordinary spend. This includes a transaction that ceases to be a valid Circle after parser correction under the parser version selected for replay.
 
 ## 11. Determinism and errors
 
 CompactSize integers MUST be minimally encoded. Numeric calculations MUST use checked integer arithmetic. Transaction values MUST not exceed Bitcoin `MAX_MONEY`.
 
-Independent implementations MUST reproduce the committed vectors in `test-vectors/v1/`. Error strings may differ, but the published error codes and valid or invalid result must agree.
+Independent implementations MUST reproduce the [committed test vectors](test-vectors/v1/). Error strings may differ, but the published error codes and valid or invalid result must agree.
 
-The canonical confirmed-state snapshot is the exact object defined by `schemas/v1/state-snapshot.schema.json`. `revision` starts at zero and increments once for each confirmed transaction that either applies a valid Circle or closes at least one active lineage through an ordinary spend. It does not increment for unrelated transactions or invalid candidates that close no active v1 lineage. Rollback restores the prior revision.
+The canonical confirmed-state snapshot is the exact object defined by the [state-snapshot schema](schemas/v1/state-snapshot.schema.json). `revision` starts at zero and increments once for each confirmed transaction that either applies a valid Circle or closes at least one active lineage through an ordinary spend. It does not increment for unrelated transactions or invalid candidates that close no active lineage. Rollback restores the prior revision.
 
 Every JSON numeric field in the snapshot MUST be a nonnegative ECMAScript safe integer, except `circleCount`, which MUST also be at least one. Every display outpoint MUST use lowercase txid hex and a canonical decimal `vout` from 0 through 4294967295. Every satoshi string MUST be canonical unsigned decimal from zero through Bitcoin `MAX_MONEY`.
 
@@ -189,9 +189,9 @@ No implementation-specific database fields may enter this snapshot. The canonica
 
 ## 12. Upgrade policy
 
-New protocol behavior requires a new version byte, a specification, threat model, schemas, cross-language vectors, activation policy, and independent implementation review. Implementations MUST NOT reinterpret v1 history under a later version.
+New protocol behavior requires a new version byte, a specification, threat model, schemas, cross-language vectors, activation policy, and independent implementation review. Implementations MUST NOT reinterpret finalized protocol history under a later version.
 
-Unknown versions and operations MAY be retained as uninterpreted candidates but MUST NOT apply their version-specific transitions to v1 state. If such a transaction spends an active v1 shard, the v1 lineage still closes under the ordinary-spend rule in section 8.
+Unknown versions and operations MAY be retained as uninterpreted candidates but MUST NOT apply their version-specific transitions to canonical state. If such a transaction spends an active shard, the lineage still closes under the ordinary-spend rule in section 8.
 
 ## 13. Wallet requirements
 
