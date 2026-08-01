@@ -81,6 +81,8 @@ Required fields are `protocol`, `version`, `kind`, `nonce`, `title`, `created`, 
 
 Aliases are untrusted labels. Applications MUST escape them and MUST NOT interpret them as identities.
 
+Schema string limits count Unicode code points, matching JSON Schema 2020-12. Every string MUST contain well-formed Unicode without unpaired surrogates. `created` and `expires` MUST be real RFC 3339 UTC timestamps ending in `Z`, and `expires` MUST be later than `created`. Alias keys MUST be 32 bytes of lowercase hex and MUST be unique within the manifest. These semantic rules are enforced by the reference validator in addition to the published structural schema.
+
 ## 6. Canonical transaction grammar
 
 A valid v1 Circle MUST satisfy every rule:

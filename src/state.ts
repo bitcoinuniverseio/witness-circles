@@ -107,19 +107,25 @@ function emptySnapshot(): WitnessStateSnapshot {
   };
 }
 
+function compareOrdinal(left: string, right: string): number {
+  if (left < right) return -1;
+  if (left > right) return 1;
+  return 0;
+}
+
 function sortSnapshot(snapshot: WitnessStateSnapshot): WitnessStateSnapshot {
   return {
     ...snapshot,
-    lineages: [...snapshot.lineages].sort((a, b) => a.lineageId.localeCompare(b.lineageId)),
-    shards: [...snapshot.shards].sort((a, b) => a.outpoint.localeCompare(b.outpoint)),
+    lineages: [...snapshot.lineages].sort((a, b) => compareOrdinal(a.lineageId, b.lineageId)),
+    shards: [...snapshot.shards].sort((a, b) => compareOrdinal(a.outpoint, b.outpoint)),
     circles: [...snapshot.circles].sort(
       (a, b) =>
         a.blockHeight - b.blockHeight ||
         a.transactionIndex - b.transactionIndex ||
-        a.txid.localeCompare(b.txid),
+        compareOrdinal(a.txid, b.txid),
     ),
     edges: [...snapshot.edges].sort(
-      (a, b) => a.toCircle.localeCompare(b.toCircle) || a.lineageId.localeCompare(b.lineageId),
+      (a, b) => compareOrdinal(a.toCircle, b.toCircle) || compareOrdinal(a.lineageId, b.lineageId),
     ),
   };
 }

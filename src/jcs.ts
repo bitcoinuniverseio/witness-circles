@@ -8,7 +8,7 @@ export type JsonValue =
   | readonly JsonValue[]
   | { readonly [key: string]: JsonValue };
 
-function assertValidUnicode(value: string): void {
+export function assertValidUnicode(value: string): void {
   for (let index = 0; index < value.length; index += 1) {
     const code = value.charCodeAt(index);
     if (code >= 0xd800 && code <= 0xdbff) {

@@ -6,6 +6,7 @@ import {
   decodeMarkerScript,
   encodeMarkerScript,
   hexToBytes,
+  validateContextManifest,
   WitnessProtocolError,
 } from "../src/index.js";
 import { loadGolden } from "./fixture.js";
@@ -23,10 +24,46 @@ describe("context manifests and markers", () => {
 
   it("rejects unknown fields and invalid Unicode", () => {
     const vector = loadGolden();
-    expect(() =>
-      canonicalizeContextManifest({ ...(vector.manifest as object), transfer: true }),
-    ).toThrow(WitnessProtocolError);
+    const manifest = validateContextManifest(vector.manifest);
+    expect(() => canonicalizeContextManifest({ ...manifest, transfer: true })).toThrow(
+      WitnessProtocolError,
+    );
     expect(() => canonicalizeJson("\ud800")).toThrow(WitnessProtocolError);
+    expect(() => validateContextManifest({ ...manifest, title: "\ud800" })).toThrow(
+      WitnessProtocolError,
+    );
+  });
+
+  it("matches schema code-point, timestamp, and lowercase alias rules", () => {
+    const vector = loadGolden();
+    const manifest = validateContextManifest(vector.manifest);
+    expect(() =>
+      validateContextManifest({ ...manifest, title: "\u754c".repeat(120) }),
+    ).not.toThrow();
+    expect(() => validateContextManifest({ ...manifest, title: "\u754c".repeat(121) })).toThrow(
+      WitnessProtocolError,
+    );
+    expect(() =>
+      validateContextManifest({
+        ...manifest,
+        created: "2026-08-01T18:00:00+00:00",
+      }),
+    ).toThrow(WitnessProtocolError);
+    expect(() =>
+      validateContextManifest({
+        ...manifest,
+        created: "2026-02-30T18:00:00Z",
+      }),
+    ).toThrow(WitnessProtocolError);
+    expect(() => validateContextManifest({ ...manifest, expires: manifest.created })).toThrow(
+      WitnessProtocolError,
+    );
+    expect(() =>
+      validateContextManifest({
+        ...manifest,
+        aliases: [{ key: "AA".repeat(32), label: "Alice" }],
+      }),
+    ).toThrow(WitnessProtocolError);
   });
 
   it("round trips markers across every network and participant count", () => {
