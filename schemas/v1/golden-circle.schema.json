@@ -19,7 +19,8 @@
     "feeSats",
     "virtualBytes",
     "prevouts",
-    "expectedLineageIds"
+    "expectedLineageIds",
+    "stateTransition"
   ],
   "properties": {
     "schemaVersion": { "const": 1 },
@@ -41,6 +42,17 @@
       "minItems": 2,
       "maxItems": 16,
       "items": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    },
+    "stateTransition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["blockHeight", "blockHash", "transactionIndex", "expectedStateHash"],
+      "properties": {
+        "blockHeight": { "type": "integer", "minimum": 0 },
+        "blockHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "transactionIndex": { "type": "integer", "minimum": 0 },
+        "expectedStateHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
     }
   }
 }

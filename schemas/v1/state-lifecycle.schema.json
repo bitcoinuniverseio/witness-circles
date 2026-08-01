@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bitcoinuniverse.dev/witc/v1/state-lifecycle.schema.json",
+  "title": "Witness Circles v1 state lifecycle vector",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "name",
+    "genesis",
+    "continuation",
+    "closure",
+    "rollbackExpectedStateHashes"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "genesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "expectedStateHash"],
+      "properties": {
+        "source": { "const": "golden-circle.json" },
+        "expectedStateHash": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "continuation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manifest",
+        "rawTransaction",
+        "txid",
+        "wtxid",
+        "feeSats",
+        "virtualBytes",
+        "currentBlockHeight",
+        "prevouts",
+        "blockHeight",
+        "blockHash",
+        "transactionIndex",
+        "expectedStateHash"
+      ],
+      "properties": {
+        "manifest": { "$ref": "context-manifest.schema.json" },
+        "rawTransaction": { "type": "string", "pattern": "^[0-9a-f]+$" },
+        "txid": { "$ref": "#/$defs/hash" },
+        "wtxid": { "$ref": "#/$defs/hash" },
+        "feeSats": { "type": "string", "pattern": "^(0|[1-9][0-9]*)$" },
+        "virtualBytes": { "type": "integer", "minimum": 1 },
+        "currentBlockHeight": { "type": "integer", "minimum": 1 },
+        "prevouts": { "$ref": "prevouts.schema.json" },
+        "blockHeight": { "type": "integer", "minimum": 0 },
+        "blockHash": { "$ref": "#/$defs/hash" },
+        "transactionIndex": { "type": "integer", "minimum": 0 },
+        "expectedStateHash": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "closure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "txid",
+        "spentOutpoints",
+        "blockHeight",
+        "blockHash",
+        "transactionIndex",
+        "expectedStateHash"
+      ],
+      "properties": {
+        "txid": { "$ref": "#/$defs/hash" },
+        "spentOutpoints": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/outpoint" }
+        },
+        "blockHeight": { "type": "integer", "minimum": 0 },
+        "blockHash": { "$ref": "#/$defs/hash" },
+        "transactionIndex": { "type": "integer", "minimum": 0 },
+        "expectedStateHash": { "$ref": "#/$defs/hash" }
+      }
+    },
+    "rollbackExpectedStateHashes": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "$ref": "#/$defs/hash" }
+    }
+  },
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "outpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["txid", "vout"],
+      "properties": {
+        "txid": { "$ref": "#/$defs/hash" },
+        "vout": { "type": "integer", "minimum": 0, "maximum": 4294967295 }
+      }
+    }
+  }
+}

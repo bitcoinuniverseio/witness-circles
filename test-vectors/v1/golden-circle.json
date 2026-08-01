@@ -48,5 +48,11 @@
     "4bc0f5c804bffee98f9d5239c11d6b9ed7473af856c6f9709763cb44276f5617",
     "63c22eae014513dbabfffe84db6131635ce44e066156be0a396b9db4f2dc18b7",
     "ee745631e7bea77a35e38ed050e495c0a5eafca41cef5dd59ce7243b5aceacdb"
-  ]
+  ],
+  "stateTransition": {
+    "blockHeight": 200,
+    "blockHash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "transactionIndex": 4,
+    "expectedStateHash": "07b97f0c2cbaa172e66a2137fefbee64c5a05f03e03967d46936cd14070523f1"
+  }
 }

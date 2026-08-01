@@ -100,7 +100,7 @@ Run `node dist/cli.js help` for complete usage.
 | `SPECIFICATION.md` | Normative v1 protocol rules |
 | `src/` | Reference codec, parser, validator, state engine, planner, SDK, and CLI |
 | `schemas/v1/` | Versioned JSON schemas for optional metadata and interchange |
-| `test-vectors/v1/` | Golden signed transaction and marker fixtures |
+| `test-vectors/v1/` | Golden signed transaction, marker, and full state-lifecycle fixtures |
 | `tests/` | Unit, property, schema, signature, validator, and state tests |
 | `docs/` | User, creator, developer, operator, commercial, launch, and legal-review material |
 | `site/` | Static commercial and documentation website |
@@ -114,7 +114,7 @@ npm run verify
 npm audit
 ```
 
-`npm run verify` runs formatting/lint checks, strict type checking, tests, the build, content/link checks, and golden-vector verification.
+`npm run verify` runs formatting/lint checks, strict type checking, tests, the build, content/link checks, and both transaction and state-lifecycle vector verification.
 
 ## Independence
 

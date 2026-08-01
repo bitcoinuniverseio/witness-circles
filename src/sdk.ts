@@ -1,4 +1,5 @@
 import { bytesToHex, hexToBytes } from "./bytes.js";
+import { MAX_MONEY_SATS } from "./constants.js";
 import { invariant } from "./errors.js";
 import {
   type CircleContextManifest,
@@ -35,6 +36,7 @@ export interface CircleSigningPolicy {
   readonly ownedOutpoint: OutPoint;
   readonly expectedContextHash: string;
   readonly maximumFeeShare: bigint;
+  readonly maximumTotalFee: bigint;
   readonly maximumFeeRateSatsPerVbyte: bigint;
 }
 
@@ -61,6 +63,15 @@ export function inspectUnsignedSigningIntent(
   const transaction = decodeTransaction(transactionHex);
   const validated = validateCircle(transaction, { ...context, signatureMode: "unsigned" });
   invariant(
+    policy.maximumFeeShare >= 0n &&
+      policy.maximumTotalFee >= 0n &&
+      policy.maximumFeeRateSatsPerVbyte >= 0n &&
+      policy.maximumFeeShare <= MAX_MONEY_SATS &&
+      policy.maximumTotalFee <= MAX_MONEY_SATS,
+    "INTEGER_RANGE",
+    "Signing fee caps are outside the supported range",
+  );
+  invariant(
     validated.marker.contextHash === policy.expectedContextHash.toLowerCase(),
     "INVALID_MARKER",
     "Context hash does not match the invitation",
@@ -79,6 +90,15 @@ export function inspectUnsignedSigningIntent(
     {
       expectedMaximum: policy.maximumFeeShare.toString(),
       actual: member.feeShare.toString(),
+    },
+  );
+  invariant(
+    validated.fee <= policy.maximumTotalFee,
+    "FEE_CAP_EXCEEDED",
+    "Circle total fee exceeds the signer cap",
+    {
+      expectedMaximum: policy.maximumTotalFee.toString(),
+      actual: validated.fee.toString(),
     },
   );
   const virtualBytes = BigInt(estimateCircleVsize(validated.marker.participantCount));

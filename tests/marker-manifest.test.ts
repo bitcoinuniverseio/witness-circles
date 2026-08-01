@@ -43,6 +43,12 @@ describe("context manifests and markers", () => {
     expect(() => validateContextManifest({ ...manifest, title: "\u754c".repeat(121) })).toThrow(
       WitnessProtocolError,
     );
+    expect(() => validateContextManifest({ ...manifest, title: ` ${manifest.title}` })).toThrow(
+      WitnessProtocolError,
+    );
+    expect(() =>
+      validateContextManifest({ ...manifest, title: `${manifest.title}\ufeff` }),
+    ).toThrow(WitnessProtocolError);
     expect(() =>
       validateContextManifest({
         ...manifest,
