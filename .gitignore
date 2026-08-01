@@ -1,0 +1,19 @@
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+site/.cache/
+*.tsbuildinfo
+
+# Social export files belong under C:\Universe\marketing, not this repository.
+social-media/
+social_media/
+social-exports/
+marketing/

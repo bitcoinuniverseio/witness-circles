@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bitcoinuniverse.dev/witc/v1/plan-request.schema.json",
+  "title": "Witness Circles v1 plan request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["network", "manifest", "participants", "feeRateSatsPerVbyte"],
+  "properties": {
+    "network": { "enum": ["mainnet", "testnet3", "signet", "regtest"] },
+    "manifest": { "$ref": "context-manifest.schema.json" },
+    "feeRateSatsPerVbyte": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+    "participants": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 16,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "txid",
+          "vout",
+          "valueSats",
+          "scriptPubKey",
+          "blockHeight",
+          "maximumFeeShareSats"
+        ],
+        "properties": {
+          "txid": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+          "vout": { "type": "integer", "minimum": 0, "maximum": 4294967295 },
+          "valueSats": { "type": "string", "pattern": "^[1-9][0-9]*$" },
+          "scriptPubKey": { "type": "string", "pattern": "^5120[0-9a-fA-F]{64}$" },
+          "blockHeight": { "type": "integer", "minimum": 0 },
+          "maximumFeeShareSats": { "type": "string", "pattern": "^(0|[1-9][0-9]*)$" }
+        }
+      }
+    }
+  }
+}

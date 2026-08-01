@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bitcoinuniverse.dev/witc/v1/golden-circle.schema.json",
+  "title": "Witness Circles v1 golden transaction vector",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "name",
+    "network",
+    "currentBlockHeight",
+    "manifest",
+    "canonicalManifest",
+    "contextHash",
+    "markerScript",
+    "rawTransaction",
+    "txid",
+    "wtxid",
+    "feeSats",
+    "virtualBytes",
+    "prevouts",
+    "expectedLineageIds"
+  ],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "name": { "type": "string", "minLength": 1 },
+    "network": { "enum": ["mainnet", "testnet3", "signet", "regtest"] },
+    "currentBlockHeight": { "type": "integer", "minimum": 1 },
+    "manifest": { "$ref": "context-manifest.schema.json" },
+    "canonicalManifest": { "type": "string", "minLength": 1 },
+    "contextHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "markerScript": { "type": "string", "pattern": "^6a28[0-9a-f]{80}$" },
+    "rawTransaction": { "type": "string", "pattern": "^[0-9a-f]+$" },
+    "txid": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "wtxid": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "feeSats": { "type": "string", "pattern": "^(0|[1-9][0-9]*)$" },
+    "virtualBytes": { "type": "integer", "minimum": 1 },
+    "prevouts": { "$ref": "prevouts.schema.json" },
+    "expectedLineageIds": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 16,
+      "items": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+    }
+  }
+}

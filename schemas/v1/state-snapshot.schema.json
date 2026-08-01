@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.bitcoinuniverse.dev/witc/v1/state-snapshot.schema.json",
+  "title": "Witness Circles v1 reference state snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "version", "revision", "lineages", "shards", "circles", "edges"],
+  "properties": {
+    "protocol": { "const": "witc" },
+    "version": { "const": 1 },
+    "revision": { "type": "integer", "minimum": 0 },
+    "lineages": { "type": "array", "items": { "type": "object" } },
+    "shards": { "type": "array", "items": { "type": "object" } },
+    "circles": { "type": "array", "items": { "type": "object" } },
+    "edges": { "type": "array", "items": { "type": "object" } }
+  }
+}

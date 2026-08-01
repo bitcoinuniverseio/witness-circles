@@ -1,0 +1,31 @@
+{
+  "network": "signet",
+  "manifest": {
+    "protocol": "witc",
+    "version": 1,
+    "kind": "circle",
+    "nonce": "90e8f5cf27f04c89a6657bc9c60e3021",
+    "title": "Reference genesis circle",
+    "created": "2026-08-01T18:00:00Z",
+    "expires": "2026-08-01T19:00:00Z"
+  },
+  "participants": [
+    {
+      "txid": "1111111111111111111111111111111111111111111111111111111111111111",
+      "vout": 0,
+      "valueSats": "30000",
+      "scriptPubKey": "512079be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      "blockHeight": 199,
+      "maximumFeeShareSats": "2000"
+    },
+    {
+      "txid": "2222222222222222222222222222222222222222222222222222222222222222",
+      "vout": 1,
+      "valueSats": "40000",
+      "scriptPubKey": "5120c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+      "blockHeight": 199,
+      "maximumFeeShareSats": "2000"
+    }
+  ],
+  "feeRateSatsPerVbyte": "5"
+}
