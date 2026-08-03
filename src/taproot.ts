@@ -1,4 +1,4 @@
-import { schnorr } from "@noble/curves/secp256k1";
+import { schnorr } from "@noble/curves/secp256k1.js";
 import { concatBytes, uint32LE, uint64LE } from "./bytes.js";
 import { SIGHASH_ALL, SIGHASH_DEFAULT } from "./constants.js";
 import { invariant } from "./errors.js";
