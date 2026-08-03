@@ -5,6 +5,11 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # v2 removes the v1 subpath import used by src/hash.ts. Lift this only
+    # alongside the source migration and its protocol-vector validation.
+    ignore:
+      - dependency-name: '@noble/hashes'
+        versions: ['>=2.0.0']
   - package-ecosystem: github-actions
     directory: /
     schedule:
