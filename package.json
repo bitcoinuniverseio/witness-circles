@@ -61,7 +61,7 @@
     "@noble/hashes": "1.8.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.1.1",
+    "@biomejs/biome": "2.5.7",
     "@scure/btc-signer": "2.2.0",
     "@types/node": "26.1.2",
     "@vitest/coverage-v8": "4.1.10",
