@@ -16,6 +16,10 @@ The final protocol is suitable for parser interoperability, wallet safety review
 
 Public source repository: [github.com/bitcoinuniverse/witness-circles](https://github.com/bitcoinuniverse/witness-circles)
 
+CI and manually requested package-candidate checks use PowerShell on the shared
+`universe-ci` pool. Certified Linux and Windows workers execute the same public
+artifact contract, and fork pull requests cannot use private runners.
+
 The final protocol supports only `CIRCLE`:
 
 - No protocol transfer operation
