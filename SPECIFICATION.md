@@ -175,7 +175,7 @@ Independent implementations MUST reproduce the [committed test vectors](test-vec
 
 The authoritative confirmed-state snapshot is the exact object defined by the [state-snapshot schema](schemas/v1/state-snapshot.schema.json). `revision` starts at zero and increments once for each confirmed transaction that either applies a valid Circle or closes at least one active lineage through an ordinary spend. It does not increment for unrelated transactions or invalid candidates that close no active lineage. Rollback restores the prior revision.
 
-Every JSON numeric field in the snapshot MUST be a nonnegative ECMAScript safe integer, except `circleCount`, which MUST also be at least one. Every display outpoint MUST use lowercase txid hex and a authoritative decimal `vout` from 0 through 4294967295. Every satoshi string MUST be authoritative unsigned decimal from zero through Bitcoin `MAX_MONEY`.
+Every JSON numeric field in the snapshot MUST be a nonnegative ECMAScript safe integer, except `circleCount`, which MUST also be at least one. Every display outpoint MUST use lowercase txid hex and an authoritative decimal `vout` from 0 through 4294967295. Every satoshi string MUST be authoritative unsigned decimal from zero through Bitcoin `MAX_MONEY`.
 
 Before hashing, implementations MUST order lowercase ASCII fields as follows:
 
