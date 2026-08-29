@@ -26,7 +26,7 @@ There is no protocol market or safe listing operation. People can sell keys outs
 
 ## Where is the description stored?
 
-Only a 32-byte hash is in the transaction. The canonical manifest can be private, self-hosted, or mirrored. Losing it does not invalidate the transaction, but its human description may become unavailable.
+Only a 32-byte hash is in the transaction. The authoritative manifest can be private, self-hosted, or mirrored. Losing it does not invalidate the transaction, but its human description may become unavailable.
 
 ## Why no CPFP?
 

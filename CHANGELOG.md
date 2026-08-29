@@ -22,7 +22,7 @@ All notable changes are documented here. Versions follow Semantic Versioning whi
 ### Fixed
 
 - Aligned manifest runtime validation with JSON Schema code-point limits, exact UTC timestamps, well-formed Unicode, and lowercase alias keys
-- Defined the canonical state-root preimage and committed a reproducible golden transition hash
+- Defined the authoritative state-root preimage and committed a reproducible golden transition hash
 - Rejected nonintegral planner positions, whitespace-padded manifest text, and aggregate inputs above Bitcoin MAX_MONEY
 - Rejected unsafe state integers, outpoint indices above uint32, and state amounts above Bitcoin MAX_MONEY before hashing
 

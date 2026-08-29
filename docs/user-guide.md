@@ -37,7 +37,7 @@ No funds are locked on-chain before broadcast. A coordinator can waste time but 
 
 ## Fees
 
-Participants share the transaction fee equally after canonical input sorting. When the total fee does not divide evenly, the first sorted slots pay one extra sat until the remainder is exhausted.
+Participants share the transaction fee equally after authoritative input sorting. When the total fee does not divide evenly, the first sorted slots pay one extra sat until the remainder is exhausted.
 
 Typical signed sizes are:
 
@@ -80,14 +80,14 @@ The final protocol has no protocol transfer or rekey. Moving control to another 
 - If the application disappears, use a compatible wallet to spend the P2TR shard normally.
 - If the key is lost, Witness Circles cannot recover it.
 - If an indexer is wrong, compare the raw transaction and prevouts with Bitcoin Core and a second independent parser.
-- If metadata disappears, retain the original canonical manifest locally. Its hash can still be checked against the transaction.
+- If metadata disappears, retain the original authoritative manifest locally. Its hash can still be checked against the transaction.
 
 ## Common errors
 
 | Error | Meaning | Safe response |
 |---|---|---|
 | `INPUT_UNCONFIRMED` | An input is not in an earlier block | Wait for confirmation and rebuild |
-| `INPUT_ORDER` | Inputs are not canonically sorted | Reject and rebuild the entire session |
+| `INPUT_ORDER` | Inputs are not authoritatively sorted | Reject and rebuild the entire session |
 | `OUTPUT_MAPPING` | A return script or amount is wrong | Do not sign |
 | `SIGHASH_UNSAFE` | Signature mode could authorize substitution | Do not sign |
 | `FEE_CAP_EXCEEDED` | Your agreed fee limit is exceeded | Wait, lower fee, or leave |

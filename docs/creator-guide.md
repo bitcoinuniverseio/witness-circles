@@ -16,7 +16,7 @@ Avoid using Circles for identity checks, attendance enforcement, financial promi
 
 ## Context design
 
-A strong title is specific, verifiable, and understandable without hype. Use an unpredictable 16-byte nonce for every session. Keep descriptions short and preserve the canonical manifest. Optional aliases require participant consent.
+A strong title is specific, verifiable, and understandable without hype. Use an unpredictable 16-byte nonce for every session. Keep descriptions short and preserve the authoritative manifest. Optional aliases require participant consent.
 
 Media should use content-addressed, allowlisted formats. A renderer must work when media or aliases are unavailable and must never execute manifest HTML or script.
 

@@ -2,7 +2,7 @@
 
 The [golden three-participant Signet vector](../../test-vectors/v1/golden-circle.json) contains a complete deterministic transaction. It commits to:
 
-- Canonical manifest and SHA-256 hash
+- Authoritative manifest and SHA-256 hash
 - Exact marker script
 - Confirmed prevouts and P2TR output keys
 - Raw signed transaction
