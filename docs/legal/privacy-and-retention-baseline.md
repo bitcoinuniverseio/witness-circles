@@ -20,7 +20,7 @@ Do not collect seeds, private keys, complete signing secrets, unrelated wallet b
 - Security logs: retain only for a documented bounded period
 - Optional manifests: retain under user-visible hosting policy
 - Account/profile data: delete or export under reviewed user-rights process
-- Canonical Bitcoin-derived data: may be re-derived and is publicly available
+- Authoritative Bitcoin-derived data: may be re-derived and is publicly available
 
 ## Cookies
 

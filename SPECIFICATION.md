@@ -69,7 +69,7 @@ The byte serialization is:
 
 ## 5. Context manifest
 
-The context manifest is JSON canonicalized with RFC 8785 JSON Canonicalization Scheme and hashed as:
+The context manifest is JSON authoritativeized with RFC 8785 JSON Authoritativeization Scheme and hashed as:
 
 ```text
 context_hash = SHA256(UTF8(JCS(manifest)))
@@ -83,7 +83,7 @@ Aliases are untrusted labels. Applications MUST escape them and MUST NOT interpr
 
 Schema string limits count Unicode code points, matching JSON Schema 2020-12. Every string MUST contain well-formed Unicode without unpaired surrogates. It MUST be unchanged by the ECMAScript `TrimString` operation used by `String.prototype.trim`, so leading or trailing ECMAScript whitespace is invalid. RFC 8785 preserves string code points without Unicode normalization. `created` and `expires` MUST be real RFC 3339 UTC timestamps ending in `Z`, and `expires` MUST be later than `created`. Alias keys MUST be 32 bytes of lowercase hex and MUST be unique within the manifest. These semantic rules are enforced by the reference validator in addition to the published structural schema.
 
-## 6. Canonical transaction grammar
+## 6. Authoritative transaction grammar
 
 A valid Circle MUST satisfy every rule:
 
@@ -155,15 +155,15 @@ The final protocol has no transfer, split, merge, rekey, refuel, mint, market, b
 
 ## 9. Confirmation and mempool
 
-Mempool observations are provisional and node-local. An indexer MAY expose pending valid candidates, conflicts, replacements, and eviction, but MUST keep these projections separate from confirmed canonical state.
+Mempool observations are provisional and node-local. An indexer MAY expose pending valid candidates, conflicts, replacements, and eviction, but MUST keep these projections separate from confirmed authoritative state.
 
-A Circle becomes canonical at one confirmation in the best chain. Applications MAY label six confirmations as settled display state, but this is not an additional protocol transition.
+A Circle becomes authoritative at one confirmation in the best chain. Applications MAY label six confirmations as settled display state, but this is not an additional protocol transition.
 
 The transaction signals opt-in RBF. Any replacement needs new signatures from every participant because signatures commit to all inputs and outputs. A compliant product MUST NOT promise CPFP, cancellation after broadcast, or successful relay.
 
 ## 10. Reorganizations
 
-An indexer MUST store block hashes and sufficient undo information. When the indexed tip no longer matches Bitcoin Core, it MUST reverse confirmed transitions in reverse transaction order until the common ancestor, then ingest the new branch in canonical transaction order.
+An indexer MUST store block hashes and sufficient undo information. When the indexed tip no longer matches Bitcoin Core, it MUST reverse confirmed transitions in reverse transaction order until the common ancestor, then ingest the new branch in authoritative transaction order.
 
 Invalid candidate fields MUST NOT apply a Circle transition. A confirmed transaction that spends an active shard but is not a valid Circle still closes that lineage as an ordinary spend. This includes a transaction that ceases to be a valid Circle after parser correction under the parser version selected for replay.
 
@@ -173,9 +173,9 @@ CompactSize integers MUST be minimally encoded. Numeric calculations MUST use ch
 
 Independent implementations MUST reproduce the [committed test vectors](test-vectors/v1/). Error strings may differ, but the published error codes and valid or invalid result must agree.
 
-The canonical confirmed-state snapshot is the exact object defined by the [state-snapshot schema](schemas/v1/state-snapshot.schema.json). `revision` starts at zero and increments once for each confirmed transaction that either applies a valid Circle or closes at least one active lineage through an ordinary spend. It does not increment for unrelated transactions or invalid candidates that close no active lineage. Rollback restores the prior revision.
+The authoritative confirmed-state snapshot is the exact object defined by the [state-snapshot schema](schemas/v1/state-snapshot.schema.json). `revision` starts at zero and increments once for each confirmed transaction that either applies a valid Circle or closes at least one active lineage through an ordinary spend. It does not increment for unrelated transactions or invalid candidates that close no active lineage. Rollback restores the prior revision.
 
-Every JSON numeric field in the snapshot MUST be a nonnegative ECMAScript safe integer, except `circleCount`, which MUST also be at least one. Every display outpoint MUST use lowercase txid hex and a canonical decimal `vout` from 0 through 4294967295. Every satoshi string MUST be canonical unsigned decimal from zero through Bitcoin `MAX_MONEY`.
+Every JSON numeric field in the snapshot MUST be a nonnegative ECMAScript safe integer, except `circleCount`, which MUST also be at least one. Every display outpoint MUST use lowercase txid hex and a authoritative decimal `vout` from 0 through 4294967295. Every satoshi string MUST be authoritative unsigned decimal from zero through Bitcoin `MAX_MONEY`.
 
 Before hashing, implementations MUST order lowercase ASCII fields as follows:
 
@@ -185,20 +185,20 @@ Before hashing, implementations MUST order lowercase ASCII fields as follows:
 - Each Circle's `members` by numeric `slot`.
 - `edges` by `toCircle`, then `lineageId`.
 
-No implementation-specific database fields may enter this snapshot. The canonical state hash is `SHA256(UTF8(RFC8785(snapshot)))`, with no prefix or trailing newline. The empty-state hash is `90e749b7720fac379610d979e29998c7d650150548622f0a47d9d3e181f1be52`. The golden transaction vector commits the first-transition state hash and block envelope. The state-lifecycle vector then commits a continuation, an ordinary-spend closure, and each reverse rollback root so independent indexers can reproduce the complete lifecycle exactly.
+No implementation-specific database fields may enter this snapshot. The authoritative state hash is `SHA256(UTF8(RFC8785(snapshot)))`, with no prefix or trailing newline. The empty-state hash is `90e749b7720fac379610d979e29998c7d650150548622f0a47d9d3e181f1be52`. The golden transaction vector commits the first-transition state hash and block envelope. The state-lifecycle vector then commits a continuation, an ordinary-spend closure, and each reverse rollback root so independent indexers can reproduce the complete lifecycle exactly.
 
 ## 12. Upgrade policy
 
 New protocol behavior requires a new version byte, a specification, threat model, schemas, cross-language vectors, activation policy, and independent implementation review. Implementations MUST NOT reinterpret finalized protocol history under a later version.
 
-Unknown versions and operations MAY be retained as uninterpreted candidates but MUST NOT apply their version-specific transitions to canonical state. If such a transaction spends an active shard, the lineage still closes under the ordinary-spend rule in section 8.
+Unknown versions and operations MAY be retained as uninterpreted candidates but MUST NOT apply their version-specific transitions to authoritative state. If such a transaction spends an active shard, the lineage still closes under the ordinary-spend rule in section 8.
 
 ## 13. Wallet requirements
 
 Before signing, a wallet MUST independently verify every rule in section 6 plus:
 
 - The owned outpoint appears exactly once.
-- The displayed context canonicalizes to the marker hash.
+- The displayed context authoritativeizes to the marker hash.
 - The owned successor and exact fee share are visible.
 - Total fee and fee rate are within user-approved caps.
 - No global xpub, peer derivation path, or unnecessary proprietary PSBT field is disclosed.

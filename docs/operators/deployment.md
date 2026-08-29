@@ -39,6 +39,6 @@ Do not expose RPC or ZMQ to an untrusted network. Use cookie authentication or a
 
 ## Backups and recovery
 
-Bitcoin-derived canonical state can be rebuilt, but checkpoints, parser versions, configuration, alerts, and optional manifests still require backup policy. Verify restores routinely. Keep immutable block references and state hashes so corruption can be detected before cutover.
+Bitcoin-derived authoritative state can be rebuilt, but checkpoints, parser versions, configuration, alerts, and optional manifests still require backup policy. Verify restores routinely. Keep immutable block references and state hashes so corruption can be detected before cutover.
 
 For parser or schema migration, replay into shadow tables, compare state hashes and query projections, stop writers briefly, then atomically switch. Rollback restores the previous parser and tables. Never perform an in-place semantic rewrite without a reproducible snapshot.

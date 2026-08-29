@@ -19,7 +19,7 @@
 ## Recovery by incident type
 
 - Parser divergence: freeze writes, replay both parsers into shadow state, publish the differing transaction, fix and verify vectors, then controlled cutover.
-- Reorganization failure: stop canonical writer, locate the common ancestor in Core, restore checkpoint, reverse state, replay, and compare state hash.
+- Reorganization failure: stop authoritative writer, locate the common ancestor in Core, restore checkpoint, reverse state, replay, and compare state hash.
 - Malicious metadata: disable fetching, retain hashes, sanitize or remove cached content, rotate media-proxy credentials, and audit CSP reports.
 - Signing vulnerability: disable coordinator broadcast and wallet entry points, revoke sessions, prepare a reviewed wallet patch, and warn affected users with exact transaction checks.
 - Dependency compromise: isolate build credentials, identify package and digest, rebuild from a known clean lockfile, rotate tokens, and publish affected versions.

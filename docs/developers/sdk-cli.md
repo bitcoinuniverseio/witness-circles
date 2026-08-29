@@ -22,7 +22,7 @@ All satoshi values are `bigint` in TypeScript and decimal strings in JSON interc
 ## Validation modes
 
 - `verify`: confirmed or fully signed transactions; checks witness shape and Schnorr signatures.
-- `shape`: checks required witness shape without cryptographic verification. Use only for narrow diagnostic tooling, not canonical indexing.
+- `shape`: checks required witness shape without cryptographic verification. Use only for narrow diagnostic tooling, not authoritative indexing.
 - `unsigned`: requires empty witnesses for a frozen pre-signing transaction.
 
 The default is `verify`.

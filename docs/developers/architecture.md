@@ -27,7 +27,7 @@ No coordinator or metadata service participates in protocol validity.
 | `manifest.ts` and `jcs.ts` | Manifest validation, RFC 8785 serialization, SHA-256 commitment |
 | `taproot.ts` | BIP341 key-path sighash and BIP340 verification |
 | `validator.ts` | Structural, fee, witness, prevout, network, and signature rules |
-| `planner.ts` | Canonical unsigned transaction and signer-minimized PSBT planning data |
+| `planner.ts` | Authoritative unsigned transaction and signer-minimized PSBT planning data |
 | `sdk.ts` | Application facade and wallet signing-intent summary |
 | `state.ts` | Reference lineage, shard, Circle, edge, closure, and rollback model |
 | `vectors.ts` | Golden fixture verification |
@@ -40,7 +40,7 @@ Mempool projections use separate tables or namespaces. They are removed or repla
 
 ## Concurrency
 
-One writer should own a chain partition and acquire a database advisory lock for canonical state. Read replicas can serve immutable block-height projections. Jobs are idempotent by block hash, txid, and parser version. Cache keys include network, canonical tip, parser version, and query parameters.
+One writer should own a chain partition and acquire a database advisory lock for authoritative state. Read replicas can serve immutable block-height projections. Jobs are idempotent by block hash, txid, and parser version. Cache keys include network, authoritative tip, parser version, and query parameters.
 
 ## Parser upgrades
 

@@ -41,7 +41,7 @@ These are operational targets, not guarantees:
 
 1. Exact 42-byte marker grammar
 2. Confirmed earlier-height P2TR prevouts
-3. Canonical input ordering
+3. Authoritative input ordering
 4. Distinct outpoints and output keys
 5. Same-script successor mapping
 6. Deterministic equal fee shares

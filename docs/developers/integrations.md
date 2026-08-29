@@ -16,7 +16,7 @@ Watch-only wallets can inspect, export, and monitor but cannot join. External wa
 
 ## Indexers
 
-Use Bitcoin Core blocks and prevouts as the only canonical input. Store blocks, raw transactions, invalid candidates, Circles, members, lineages, shards, edges, conflicts, replacements, reorganizations, checkpoints, parser versions, and state hashes.
+Use Bitcoin Core blocks and prevouts as the only authoritative input. Store blocks, raw transactions, invalid candidates, Circles, members, lineages, shards, edges, conflicts, replacements, reorganizations, checkpoints, parser versions, and state hashes.
 
 Never accept frontend-provided validity or optional manifest fields as state. Verify the golden vector at startup and expose the parser version in status responses.
 
