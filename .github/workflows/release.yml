@@ -7,8 +7,15 @@ permissions:
   contents: read
 
 jobs:
+  route:
+    uses: bitcoinuniverseio/.github-private/.github/workflows/route.yml@develop
+    secrets: inherit
+    with:
+      plan: '{"package_2":"light"}'
+
   package:
-    runs-on: [self-hosted, universe-ci]
+    needs: route
+    runs-on: ${{ fromJSON(needs.route.outputs.targets).package_2 }}
     timeout-minutes: 15
     defaults:
       run:
