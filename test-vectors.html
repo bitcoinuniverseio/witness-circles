@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Witness Circles test vectors, valid and invalid cases</title>
+<meta name="description" content="The published Witness Circles vectors: marker cases with required error codes, a fully signed golden Signet transaction, and a three transition state lifecycle with rollback roots.">
+<link rel="canonical" href="https://bitcoinuniverseio.github.io/witness-circles/test-vectors.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Witness Circles protocol documentation">
+<meta property="og:title" content="Witness Circles test vectors">
+<meta property="og:description" content="The published Witness Circles vectors: marker cases with required error codes, a fully signed golden Signet transaction, and a three transition state lifecycle with rollback roots.">
+<meta property="og:url" content="https://bitcoinuniverseio.github.io/witness-circles/test-vectors.html">
+<meta property="og:image" content="https://bitcoinuniverseio.github.io/witness-circles/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Concentric rings with member nodes joined by attestation arcs around a WITC marker">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Witness Circles test vectors">
+<meta name="twitter:description" content="The published Witness Circles vectors: marker cases with required error codes, a fully signed golden Signet transaction, and a three transition state lifecycle with rollback roots.">
+<meta name="twitter:image" content="https://bitcoinuniverseio.github.io/witness-circles/assets/og-card.png">
+<meta name="theme-color" content="#070c10" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f5f8f9" media="(prefers-color-scheme: light)">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14" fill="none" stroke="var(--dim)" stroke-width="1.5"/><circle cx="16" cy="16" r="9" fill="none" stroke="var(--accent)" stroke-width="2.5"/><circle cx="16" cy="2.5" r="2.6" fill="var(--accent)"/><circle cx="28" cy="23" r="2.6" fill="var(--accent)"/><circle cx="4" cy="23" r="2.6" fill="var(--accent)"/></svg><span>Witness Circles<small>WITC protocol</small></span></a>
+    <div class="search">
+      <label class="sr-only" for="site-search">Search this documentation</label>
+      <input id="site-search" type="search" placeholder="Search (press /)" autocomplete="off" data-search-input data-search-base="" aria-describedby="search-hint">
+      <ul class="search-results" data-search-results aria-live="polite"></ul>
+    </div>
+    <div class="header-tools">
+      <button class="icon-button" type="button" data-theme-toggle aria-pressed="false">Light theme</button>
+      <button class="nav-toggle" type="button" data-nav-toggle aria-controls="site-nav">Menu</button>
+    </div>
+    <nav class="site-nav" id="site-nav" data-nav aria-label="Documentation sections">
+      <a href="index.html">Overview</a>
+      <a href="specification.html">Specification</a>
+      <a href="guide.html">Guide</a>
+      <a href="reference.html">Reference</a>
+      <a href="test-vectors.html" aria-current="page">Test vectors</a>
+      <a href="schemas.html">Schemas</a>
+      <a href="simulator.html">Simulator</a>
+      <a href="conformance.html">Conformance</a>
+      <a href="changelog.html">Changelog</a>
+    </nav>
+    <p id="search-hint" class="sr-only">Search requires JavaScript. Every page is linked from the navigation.</p>
+  </div>
+</header>
+<main id="main">
+<div class="shell">
+  <div class="page-head">
+    <p class="eyebrow">Test vectors</p>
+    <h1>Committed test vectors</h1>
+    <p class="lede">These files are normative. An implementation that disagrees with any of them is not interoperable. They live in <a href="https://github.com/bitcoinuniverseio/witness-circles/tree/main/test-vectors/v1">test-vectors/v1/</a> and are dedicated under CC0 1.0 so anyone can reuse them.</p>
+  </div>
+  <div class="with-aside">
+  <aside class="page-aside">
+    <h2>On this page</h2>
+    <ol>
+      <li><a href="#markers">Marker vectors</a></li>
+      <li><a href="#golden">Golden circle</a></li>
+      <li><a href="#lifecycle">State lifecycle</a></li>
+      <li><a href="#running">Running them</a></li>
+      <li><a href="#policy">Fixture policy</a></li>
+    </ol>
+  </aside>
+  <div>
+
+  <h2 id="markers">Marker vectors</h2>
+  <p>File: <a href="test-vectors/v1/marker-vectors.json">test-vectors/v1/marker-vectors.json</a>. One accepted encoding and three rejected ones, each pinned to the error code a conforming decoder must produce.</p>
+  <h3>Valid</h3>
+  <div class="scroll-x"><table>
+    <thead><tr><th scope="col">Name</th><th scope="col">Script</th><th scope="col">Decodes to</th></tr></thead>
+    <tbody>
+      <tr>
+        <th scope="row">signet-three-participant</th>
+        <td class="hex">6a285749544301020103ad2608134839e732280cb93bdd5b8682626dce5748a65c437a39cdcb680c2a82</td>
+        <td>Signet, version 1, CIRCLE, 3 participants, context hash <code class="hex">ad260813…680c2a82</code></td>
+      </tr>
+    </tbody>
+  </table></div>
+  <h3>Invalid</h3>
+  <div class="scroll-x"><table>
+    <thead><tr><th scope="col">Name</th><th scope="col">What is wrong</th><th scope="col">Required error</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">pushdata1-is-ambiguous</th><td>Uses <code>6a4c28</code>, a <code>PUSHDATA1</code> push of the same 40 bytes. The payload is identical, the encoding is not minimal.</td><td><code>AMBIGUOUS_ENCODING</code></td></tr>
+      <tr><th scope="row">reserved-refuel-opcode</th><td>Operation byte <code>0x02</code>. A future or reserved operation must be rejected, never guessed.</td><td><code>INVALID_OPCODE</code></td></tr>
+      <tr><th scope="row">zero-context-hash</th><td>Thirty-two zero bytes where the context hash belongs.</td><td><code>CONTEXT_HASH_ZERO</code></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><p>The first case is the one that separates a careful parser from a lax one. Both encodings push the same 40 bytes, so a decoder that reads the payload without checking how it was pushed will accept a second valid encoding of the same Circle, and two implementations will then disagree about which transactions exist.</p></div>
+
+  <h2 id="golden">Golden circle vector</h2>
+  <p>File: <a href="test-vectors/v1/golden-circle.json">test-vectors/v1/golden-circle.json</a>. A complete, fully signed three participant Signet transaction with every derived value committed.</p>
+  <div class="scroll-x"><table>
+    <thead><tr><th scope="col">Committed field</th><th scope="col">Value</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">network</th><td>signet, <code>currentBlockHeight</code> 200</td></tr>
+      <tr><th scope="row">contextHash</th><td class="hex">ad2608134839e732280cb93bdd5b8682626dce5748a65c437a39cdcb680c2a82</td></tr>
+      <tr><th scope="row">markerScript</th><td class="hex">6a285749544301020103ad2608134839e732280cb93bdd5b8682626dce5748a65c437a39cdcb680c2a82</td></tr>
+      <tr><th scope="row">txid</th><td class="hex">3703d5b332ebf2871a0a24066f7ea4b84dd3e9ebca1b1a879140e844c64b0f65</td></tr>
+      <tr><th scope="row">wtxid</th><td class="hex">772b6d1d179e6f5ba1c4699486a754ef7681b6299ee0e023fc2a5dd0c11245ab</td></tr>
+      <tr><th scope="row">feeSats</th><td class="num">3630</td></tr>
+      <tr><th scope="row">virtualBytes</th><td class="num">363</td></tr>
+      <tr><th scope="row">expectedLineageIds</th><td class="hex">4bc0f5c804bffee98f9d5239c11d6b9ed7473af856c6f9709763cb44276f5617<br>63c22eae014513dbabfffe84db6131635ce44e066156be0a396b9db4f2dc18b7<br>ee745631e7bea77a35e38ed050e495c0a5eafca41cef5dd59ce7243b5aceacdb</td></tr>
+      <tr><th scope="row">stateTransition.expectedStateHash</th><td class="hex">07b97f0c2cbaa172e66a2137fefbee64c5a05f03e03967d46936cd14070523f1</td></tr>
+    </tbody>
+  </table></div>
+  <p>An implementation must reproduce every one of those from the raw transaction and the three listed prevouts alone. The vector also carries the RFC 8785 serialization of the context manifest as a string, so a JCS implementation can be checked without a Bitcoin transaction at all.</p>
+  <div class="warn"><p>The fixture private keys behind these signatures are small public test constants used only to make the signatures deterministic. They must never receive real funds on any network.</p></div>
+
+  <h2 id="lifecycle">State lifecycle vector</h2>
+  <p>File: <a href="test-vectors/v1/state-lifecycle.json">test-vectors/v1/state-lifecycle.json</a>. Three confirmed transitions and the three rollback roots, which together pin the entire state machine including reorganization behaviour.</p>
+  <div class="scroll-x"><table>
+    <thead><tr><th scope="col" class="num">Step</th><th scope="col">Event</th><th scope="col">Effect on state</th><th scope="col">Expected state hash</th></tr></thead>
+    <tbody>
+      <tr><th scope="row" class="num">0</th><td>Empty index</td><td>revision 0, nothing recorded</td><td class="hex">90e749b7720fac379610d979e29998c7d650150548622f0a47d9d3e181f1be52</td></tr>
+      <tr><th scope="row" class="num">1</th><td>Genesis Circle at height 200, tx index 4</td><td>revision 1, three lineages created, three shards, no edges</td><td class="hex">07b97f0c2cbaa172e66a2137fefbee64c5a05f03e03967d46936cd14070523f1</td></tr>
+      <tr><th scope="row" class="num">2</th><td>Continuation Circle at height 201, tx index 1</td><td>revision 2, two lineages advance to <code>circleCount</code> 2, two continuation edges, two new shards</td><td class="hex">b29662d78f73f3f8940b2dccaf935dc2a7f1ceba21ef6b1c5b11a7d7f3f5a6fc</td></tr>
+      <tr><th scope="row" class="num">3</th><td>Ordinary spend of <code>f7c7…28ef:1</code> at height 202</td><td>revision 3, one lineage closed, its shard marked spent</td><td class="hex">faf7f730b9b48b39c4509dc3ccb23c94cac6979d334a57fbd1eda20dab7af84c</td></tr>
+    </tbody>
+  </table></div>
+  <p>Rolling the three transitions back in reverse order must produce exactly:</p>
+  <ol>
+    <li><code class="hex">b29662d78f73f3f8940b2dccaf935dc2a7f1ceba21ef6b1c5b11a7d7f3f5a6fc</code></li>
+    <li><code class="hex">07b97f0c2cbaa172e66a2137fefbee64c5a05f03e03967d46936cd14070523f1</code></li>
+    <li><code class="hex">90e749b7720fac379610d979e29998c7d650150548622f0a47d9d3e181f1be52</code></li>
+  </ol>
+  <p>Note that the third rollback root is the empty-state hash, so a correct implementation returns to a byte-identical empty index rather than to a nearly empty one.</p>
+  <p class="js-only"><a class="button" href="simulator.html#replay">Replay all three transitions in your browser</a></p>
+
+  <h2 id="running">Running the vectors</h2>
+  <p>Against the reference implementation, from a clone of the repository:</p>
+  <pre><code>npm ci
+npm run build
+node dist/cli.js vectors verify        # golden transaction and state lifecycle
+npm run verify                         # lint, types, tests, build, content and vectors</code></pre>
+  <p>Against your own implementation, follow the differential procedure on the <a href="conformance.html">conformance page</a>. This site also ships a browser reimplementation of the parser, validator and state engine, and the <a href="simulator.html#replay">simulator</a> replays every vector on the page so you can see each expected value being reproduced.</p>
+
+  <h2 id="policy">Fixture policy</h2>
+  <ul>
+    <li>Adding or changing a normative rule requires a vector that fails before the change and passes after it, plus an inverse invalid case where one applies.</li>
+    <li>Vectors are versioned by directory (<code>v1</code>). A new protocol version gets a new directory, and existing vectors are never edited to match new behaviour.</li>
+    <li>Error strings may differ between implementations. The published error codes and the valid or invalid verdict may not.</li>
+    <li>Every vector is validated against its JSON Schema in this repository's own test suite, so a malformed vector cannot be committed.</li>
+  </ul>
+  </div>
+  </div>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="shell">
+    <dl class="footer-meta">
+      <div><dt>Owning repository</dt><dd><a href="https://github.com/bitcoinuniverseio/witness-circles">bitcoinuniverseio/witness-circles</a></dd></div>
+      <div><dt>Source path</dt><dd><code>test-vectors/v1/</code></dd></div>
+      <div><dt>Specification version</dt><dd>1.0.0</dd></div>
+      <div><dt>Lifecycle</dt><dd>Experimental</dd></div>
+      <div><dt>Chain and networks</dt><dd>Bitcoin. Signet and regtest for creation, all four network identifiers for parsing.</dd></div>
+      <div><dt>Last verified</dt><dd><time datetime="2026-09-01">2026-09-01</time> at commit <code>6507df3848c9</code></dd></div>
+    </dl>
+    <ul class="footer-links">
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/edit/main/test-vectors.html">Edit this page on GitHub</a></li>
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/blob/main/SPECIFICATION.md">Normative specification</a></li>
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/security/policy">Report a vulnerability</a></li>
+      <li><a href="https://docs.bitcoinuniverse.io">Bitcoin Universe documentation portal</a></li>
+      <li><a href="llms.txt">llms.txt</a></li>
+    </ul>
+    <p class="footer-note">Witness Circles is an original Bitcoin Universe protocol. It creates no token, no balance, no transferable asset and no market. A confirmed Circle proves that distinct Taproot output keys authorized one exact Bitcoin transaction, and nothing more. Code is MIT licensed; the specification and test vectors are dedicated under CC0 1.0.</p>
+  </div>
+</footer>
+</body>
+</html>

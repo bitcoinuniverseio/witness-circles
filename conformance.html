@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Witness Circles conformance requirements</title>
+<meta name="description" content="What a conforming Witness Circles implementation must reproduce: three levels, what must agree, the differential testing procedure and a self-declaration template.">
+<link rel="canonical" href="https://bitcoinuniverseio.github.io/witness-circles/conformance.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Witness Circles protocol documentation">
+<meta property="og:title" content="Witness Circles conformance">
+<meta property="og:description" content="What a conforming Witness Circles implementation must reproduce: three levels, what must agree, the differential testing procedure and a self-declaration template.">
+<meta property="og:url" content="https://bitcoinuniverseio.github.io/witness-circles/conformance.html">
+<meta property="og:image" content="https://bitcoinuniverseio.github.io/witness-circles/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Concentric rings with member nodes joined by attestation arcs around a WITC marker">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Witness Circles conformance">
+<meta name="twitter:description" content="What a conforming Witness Circles implementation must reproduce: three levels, what must agree, the differential testing procedure and a self-declaration template.">
+<meta name="twitter:image" content="https://bitcoinuniverseio.github.io/witness-circles/assets/og-card.png">
+<meta name="theme-color" content="#070c10" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f5f8f9" media="(prefers-color-scheme: light)">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14" fill="none" stroke="var(--dim)" stroke-width="1.5"/><circle cx="16" cy="16" r="9" fill="none" stroke="var(--accent)" stroke-width="2.5"/><circle cx="16" cy="2.5" r="2.6" fill="var(--accent)"/><circle cx="28" cy="23" r="2.6" fill="var(--accent)"/><circle cx="4" cy="23" r="2.6" fill="var(--accent)"/></svg><span>Witness Circles<small>WITC protocol</small></span></a>
+    <div class="search">
+      <label class="sr-only" for="site-search">Search this documentation</label>
+      <input id="site-search" type="search" placeholder="Search (press /)" autocomplete="off" data-search-input data-search-base="" aria-describedby="search-hint">
+      <ul class="search-results" data-search-results aria-live="polite"></ul>
+    </div>
+    <div class="header-tools">
+      <button class="icon-button" type="button" data-theme-toggle aria-pressed="false">Light theme</button>
+      <button class="nav-toggle" type="button" data-nav-toggle aria-controls="site-nav">Menu</button>
+    </div>
+    <nav class="site-nav" id="site-nav" data-nav aria-label="Documentation sections">
+      <a href="index.html">Overview</a>
+      <a href="specification.html">Specification</a>
+      <a href="guide.html">Guide</a>
+      <a href="reference.html">Reference</a>
+      <a href="test-vectors.html">Test vectors</a>
+      <a href="schemas.html">Schemas</a>
+      <a href="simulator.html">Simulator</a>
+      <a href="conformance.html" aria-current="page">Conformance</a>
+      <a href="changelog.html">Changelog</a>
+    </nav>
+    <p id="search-hint" class="sr-only">Search requires JavaScript. Every page is linked from the navigation.</p>
+  </div>
+</header>
+<main id="main">
+<div class="shell">
+  <div class="page-head">
+    <p class="eyebrow">Conformance</p>
+    <h1>Conformance</h1>
+    <p class="lede">Witness Circles is deliberately small so that a second implementation is realistic. This page states exactly what has to agree.</p>
+  </div>
+  <div class="with-aside">
+  <aside class="page-aside">
+    <h2>On this page</h2>
+    <ol>
+      <li><a href="#levels">Three levels</a></li>
+      <li><a href="#must">What must agree</a></li>
+      <li><a href="#procedure">Differential procedure</a></li>
+      <li><a href="#declaration">Self-declaration</a></li>
+      <li><a href="#changes">Changing a rule</a></li>
+    </ol>
+  </aside>
+  <div>
+
+  <h2 id="levels">Three levels</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Level 1: parser</h3>
+      <p>Decodes Bitcoin transactions strictly and decodes the WITC marker. Reproduces the marker vectors, including all three rejections. Does not need prevouts, signatures or state.</p>
+    </div>
+    <div class="card">
+      <h3>Level 2: validator</h3>
+      <p>Everything in level 1, plus the seventeen grammar rules, BIP341 key-path sighash, BIP340 verification and the fee allocation. Reproduces the golden transaction vector including txid, wtxid, fee, virtual size and lineage identifiers.</p>
+    </div>
+    <div class="card">
+      <h3>Level 3: indexer</h3>
+      <p>Everything in level 2, plus the state snapshot, its ordering rules, the state hash, ordinary-spend closure and rollback. Reproduces every hash in the state lifecycle vector, forwards and in reverse.</p>
+    </div>
+  </div>
+  <p>The reference implementation in this repository is a level 3 implementation, and its own test suite runs the same checks that are demanded here.</p>
+
+  <h2 id="must">What must agree, and what may differ</h2>
+  <div class="scroll-x"><table>
+    <thead><tr><th scope="col">Must agree exactly</th><th scope="col">May differ</th></tr></thead>
+    <tbody>
+      <tr><td>The valid or invalid verdict on every input</td><td>Error message wording and language</td></tr>
+      <tr><td>The published error code for each invalid case</td><td>Exception type, error hierarchy, logging</td></tr>
+      <tr><td>txid, wtxid, weight and virtual size</td><td>Internal representation of amounts and scripts</td></tr>
+      <tr><td>Fee total and the per-slot fee shares</td><td>Whether shares are computed eagerly or lazily</td></tr>
+      <tr><td>Slot assignment after sorting</td><td>The sorting algorithm used</td></tr>
+      <tr><td>Lineage identifiers</td><td>How lineages are stored or cached</td></tr>
+      <tr><td>The state snapshot contents and the state hash</td><td>Database schema, indexes, replication, transport</td></tr>
+      <tr><td>Revision numbering across applies and rollbacks</td><td>Whether undo data is a journal, a log, or a snapshot store</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note"><p>The state hash is the single strongest interoperability check. Two indexers that agree on it after every block agree on everything the protocol defines, because no implementation-specific field is allowed inside the hashed object.</p></div>
+
+  <h2 id="procedure">Differential testing procedure</h2>
+  <ol>
+    <li>Parse the raw transaction in <code>golden-circle.json</code> without using this repository's SDK.</li>
+    <li>Load the three listed prevouts.</li>
+    <li>Verify every BIP341 key-path signature.</li>
+    <li>Reproduce the marker fields, fee shares, txid, wtxid, virtual size and lineage identifiers.</li>
+    <li>Reject every invalid marker vector at the same semantic boundary, with the published code.</li>
+    <li>Apply the three lifecycle transitions and compare each state hash.</li>
+    <li>Roll back three times and compare each rollback root, ending at the empty-state hash.</li>
+    <li>Publish your implementation language, version, parser digest and result.</li>
+  </ol>
+  <p>Property-based testing is recommended beyond the fixtures: random participant counts from 2 to 16, random fee totals including values that are not divisible by N, values at the 1,000 sat successor boundary, and values at <code>MAX_MONEY</code>. The reference suite uses this approach and it is what catches remainder-assignment and overflow mistakes.</p>
+
+  <h2 id="declaration">Self-declaration template</h2>
+  <p>There is no certification body and no registry of implementations. Publish a declaration next to your source so that others can check it themselves.</p>
+  <pre><code>Implementation: &lt;name&gt;
+Language and runtime: &lt;for example Rust 1.9x&gt;
+Specification version: 1.0.0
+Conformance level: 1 | 2 | 3
+Vector set: test-vectors/v1 at commit &lt;40 hex sha&gt;
+Marker vectors:        1 valid accepted, 3 invalid rejected with matching codes
+Golden circle vector:  txid, wtxid, fee, vsize, lineage ids reproduced
+Lifecycle vector:      3 transition hashes and 3 rollback roots reproduced
+Signature verification: yes | no  (no means level 1 only)
+Networks supported:     parse mainnet, testnet3, signet, regtest; create signet, regtest
+Known divergences:      &lt;none, or an explicit list&gt;</code></pre>
+
+  <h2 id="changes">Changing a rule</h2>
+  <p>The rules on this site are final for protocol version <code>0x01</code>. New behaviour requires a new version byte with its own specification, threat model, schemas, cross-language vectors, activation policy and independent review. An implementation must never reinterpret finalized history under a later version, and an unknown version or operation is retained as an uninterpreted candidate rather than guessed at.</p>
+  <p>Within version 1, any change to a normative rule requires a vector that fails before the change and passes after it, plus an inverse invalid case where one applies. That is the only mechanism by which the meaning of a rule can move, and it always leaves an auditable artefact.</p>
+  </div>
+  </div>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="shell">
+    <dl class="footer-meta">
+      <div><dt>Owning repository</dt><dd><a href="https://github.com/bitcoinuniverseio/witness-circles">bitcoinuniverseio/witness-circles</a></dd></div>
+      <div><dt>Source path</dt><dd><code>docs/developers/test-vectors.md, src/vectors.ts</code></dd></div>
+      <div><dt>Specification version</dt><dd>1.0.0</dd></div>
+      <div><dt>Lifecycle</dt><dd>Experimental</dd></div>
+      <div><dt>Chain and networks</dt><dd>Bitcoin. Signet and regtest for creation, all four network identifiers for parsing.</dd></div>
+      <div><dt>Last verified</dt><dd><time datetime="2026-09-01">2026-09-01</time> at commit <code>6507df3848c9</code></dd></div>
+    </dl>
+    <ul class="footer-links">
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/edit/main/conformance.html">Edit this page on GitHub</a></li>
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/blob/main/SPECIFICATION.md">Normative specification</a></li>
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/security/policy">Report a vulnerability</a></li>
+      <li><a href="https://docs.bitcoinuniverse.io">Bitcoin Universe documentation portal</a></li>
+      <li><a href="llms.txt">llms.txt</a></li>
+    </ul>
+    <p class="footer-note">Witness Circles is an original Bitcoin Universe protocol. It creates no token, no balance, no transferable asset and no market. A confirmed Circle proves that distinct Taproot output keys authorized one exact Bitcoin transaction, and nothing more. Code is MIT licensed; the specification and test vectors are dedicated under CC0 1.0.</p>
+  </div>
+</footer>
+</body>
+</html>

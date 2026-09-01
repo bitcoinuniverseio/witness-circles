@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Witness Circles circle state simulator</title>
+<meta name="description" content="Build a circle in the browser, watch its derived state change, see exactly when it closes and when it does not, and replay the published Witness Circles test vectors locally.">
+<link rel="canonical" href="https://bitcoinuniverseio.github.io/witness-circles/simulator.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Witness Circles protocol documentation">
+<meta property="og:title" content="Circle state simulator">
+<meta property="og:description" content="Build a circle in the browser, watch its derived state change, see exactly when it closes and when it does not, and replay the published Witness Circles test vectors locally.">
+<meta property="og:url" content="https://bitcoinuniverseio.github.io/witness-circles/simulator.html">
+<meta property="og:image" content="https://bitcoinuniverseio.github.io/witness-circles/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Concentric rings with member nodes joined by attestation arcs around a WITC marker">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Circle state simulator">
+<meta name="twitter:description" content="Build a circle in the browser, watch its derived state change, see exactly when it closes and when it does not, and replay the published Witness Circles test vectors locally.">
+<meta name="twitter:image" content="https://bitcoinuniverseio.github.io/witness-circles/assets/og-card.png">
+<meta name="theme-color" content="#070c10" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f5f8f9" media="(prefers-color-scheme: light)">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css">
+<script src="assets/site.js" defer></script>
+<script src="assets/witc.js" defer></script>
+<script src="assets/simulator.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14" fill="none" stroke="var(--dim)" stroke-width="1.5"/><circle cx="16" cy="16" r="9" fill="none" stroke="var(--accent)" stroke-width="2.5"/><circle cx="16" cy="2.5" r="2.6" fill="var(--accent)"/><circle cx="28" cy="23" r="2.6" fill="var(--accent)"/><circle cx="4" cy="23" r="2.6" fill="var(--accent)"/></svg><span>Witness Circles<small>WITC protocol</small></span></a>
+    <div class="search">
+      <label class="sr-only" for="site-search">Search this documentation</label>
+      <input id="site-search" type="search" placeholder="Search (press /)" autocomplete="off" data-search-input data-search-base="" aria-describedby="search-hint">
+      <ul class="search-results" data-search-results aria-live="polite"></ul>
+    </div>
+    <div class="header-tools">
+      <button class="icon-button" type="button" data-theme-toggle aria-pressed="false">Light theme</button>
+      <button class="nav-toggle" type="button" data-nav-toggle aria-controls="site-nav">Menu</button>
+    </div>
+    <nav class="site-nav" id="site-nav" data-nav aria-label="Documentation sections">
+      <a href="index.html">Overview</a>
+      <a href="specification.html">Specification</a>
+      <a href="guide.html">Guide</a>
+      <a href="reference.html">Reference</a>
+      <a href="test-vectors.html">Test vectors</a>
+      <a href="schemas.html">Schemas</a>
+      <a href="simulator.html" aria-current="page">Simulator</a>
+      <a href="conformance.html">Conformance</a>
+      <a href="changelog.html">Changelog</a>
+    </nav>
+    <p id="search-hint" class="sr-only">Search requires JavaScript. Every page is linked from the navigation.</p>
+  </div>
+</header>
+<main id="main">
+<div class="shell">
+  <div class="page-head">
+    <p class="eyebrow">Interactive</p>
+    <h1>Circle state simulator</h1>
+    <p class="lede">Add members, remove them, withhold a signature, break a rule, and watch the derived state change. Everything runs in this tab. Nothing you type is sent anywhere, stored, or logged.</p>
+    <ul class="pill-row">
+      <li class="pill on">Specification 1.0.0</li>
+      <li class="pill on">Network: Signet and regtest</li>
+      <li class="pill">Structural rules and state only</li>
+    </ul>
+  </div>
+
+  <div class="warn">
+    <p><strong>What this tool does not do.</strong> Browsers expose no Schnorr primitive, so signatures are checked for shape, not verified. That is the <code>shape</code> validation mode of the reference implementation and it is explicitly not sufficient for authoritative indexing. Everything else, including transaction decoding, txid and wtxid, fee allocation, lineage derivation, the state snapshot and the state hash, is computed here exactly as <code>src/</code> computes it, and the <a href="#replay">vector replay</a> below proves it against the published fixtures.</p>
+  </div>
+
+  <noscript><div class="bad"><p>This page needs JavaScript for the simulator only. Every rule it applies is written out in the <a href="specification.html">specification</a>, and every value it reproduces is published on the <a href="test-vectors.html">test vectors</a> page.</p></div></noscript>
+
+  <div class="js-only">
+  <h2 id="builder">Build a circle</h2>
+  <p>The builder starts loaded with the published golden Signet vector: three members, 30,000, 40,000 and 50,000 sats, at 10 sat/vB. Change anything and the verdict updates immediately.</p>
+
+  <div class="tool" data-builder>
+    <div class="grid tight">
+      <label class="field"><span>Network</span>
+        <select data-network>
+          <option value="signet" selected>Signet</option>
+          <option value="regtest">regtest</option>
+        </select>
+      </label>
+      <label class="field"><span>Fee rate (sat/vB)</span>
+        <input type="number" min="1" max="1000" step="1" value="10" data-fee-rate>
+      </label>
+      <label class="field"><span>Circle block height</span>
+        <input type="number" min="1" step="1" value="200" data-circle-height>
+      </label>
+      <label class="field"><span>Inputs confirmed at height</span>
+        <input type="number" min="0" step="1" value="199" data-input-height>
+      </label>
+    </div>
+    <label class="field"><span>Context hash (32 bytes, from the manifest)</span>
+      <input type="text" spellcheck="false" data-context-hash>
+    </label>
+
+    <h3>Members</h3>
+    <ul class="member-list" data-members></ul>
+    <div class="button-row tight">
+      <button class="button ghost" type="button" data-add-member>Add a member</button>
+      <button class="button ghost" type="button" data-preset="valid">Reset to the golden vector</button>
+    </div>
+
+    <h3>Try a failure</h3>
+    <div class="button-row tight-top">
+      <button class="button ghost" type="button" data-preset="open">Withhold one signature</button>
+      <button class="button ghost" type="button" data-preset="duplicate-key">Two slots, one key</button>
+      <button class="button ghost" type="button" data-preset="duplicate-input">Two slots, one outpoint</button>
+      <button class="button ghost" type="button" data-preset="dust">Successor below 1,000 sats</button>
+      <button class="button ghost" type="button" data-preset="unconfirmed">Unconfirmed input</button>
+      <button class="button ghost" type="button" data-preset="single">Only one member</button>
+    </div>
+
+    <div class="tool-grid">
+      <div>
+        <div class="verdict" data-verdict data-state="valid" aria-live="polite"></div>
+        <ul class="steps" data-steps></ul>
+      </div>
+      <div>
+        <div data-ring></div>
+        <p class="tool-note" data-ring-text aria-live="polite"></p>
+        <dl class="kv" data-facts></dl>
+      </div>
+    </div>
+
+    <h3>Fee allocation</h3>
+    <div class="scroll-x" data-allocation></div>
+    <h3>Marker script</h3>
+    <p class="hex" data-marker-out></p>
+    <p class="tool-note">Fee shares follow section 7 exactly: q = floor(F / N), and the first F mod N slots each pay one extra satoshi. Slots come from sorting inputs by display txid then vout, which is why editing an outpoint can move a member to a different slot and change who pays the remainder.</p>
+  </div>
+
+  <h2 id="decoder">Decode a marker</h2>
+  <p>Paste a 42 byte marker scriptPubKey as hex. Invalid encodings are reported with the same error code the reference decoder raises.</p>
+  <div class="tool" data-decoder>
+    <label class="field"><span>Marker scriptPubKey (hex)</span>
+      <textarea spellcheck="false" placeholder="6a2857495443…"></textarea>
+    </label>
+    <div class="button-row tight">
+      <button class="button ghost" type="button" data-decoder-sample="6a285749544301020103ad2608134839e732280cb93bdd5b8682626dce5748a65c437a39cdcb680c2a82">Load the valid vector</button>
+      <button class="button ghost" type="button" data-decoder-sample="6a4c285749544301020103ad2608134839e732280cb93bdd5b8682626dce5748a65c437a39cdcb680c2a82">Load the PUSHDATA1 case</button>
+      <button class="button ghost" type="button" data-decoder-sample="6a285749544301020203ad2608134839e732280cb93bdd5b8682626dce5748a65c437a39cdcb680c2a82">Load the reserved operation case</button>
+    </div>
+    <div data-decoder-out aria-live="polite"></div>
+  </div>
+
+  <h2 id="replay">Replay the published vectors</h2>
+  <p>This reads <code>test-vectors/v1/</code> from this site, decodes the real signed transactions, and reproduces every committed value: txids, wtxids, fee, virtual size, lineage identifiers, all three state hashes and all three rollback roots. If any line below is marked as disagreeing, this page and the repository have drifted apart.</p>
+  <div class="tool" data-replay data-base="">
+    <div class="button-row tight">
+      <button class="button" type="button" data-replay-run>Run the full replay</button>
+    </div>
+    <div class="tool-grid">
+      <ul class="steps" data-replay-log aria-live="polite"></ul>
+      <div data-replay-state></div>
+    </div>
+    <p class="tool-note">The state panel shows the snapshot after each applied transition, ending with the empty index after the third rollback.</p>
+  </div>
+  </div>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="shell">
+    <dl class="footer-meta">
+      <div><dt>Owning repository</dt><dd><a href="https://github.com/bitcoinuniverseio/witness-circles">bitcoinuniverseio/witness-circles</a></dd></div>
+      <div><dt>Source path</dt><dd><code>assets/witc.js, assets/simulator.js</code></dd></div>
+      <div><dt>Specification version</dt><dd>1.0.0</dd></div>
+      <div><dt>Lifecycle</dt><dd>Experimental</dd></div>
+      <div><dt>Chain and networks</dt><dd>Bitcoin. Signet and regtest for creation, all four network identifiers for parsing.</dd></div>
+      <div><dt>Last verified</dt><dd><time datetime="2026-09-01">2026-09-01</time> at commit <code>6507df3848c9</code></dd></div>
+    </dl>
+    <ul class="footer-links">
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/edit/main/simulator.html">Edit this page on GitHub</a></li>
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/blob/main/SPECIFICATION.md">Normative specification</a></li>
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/security/policy">Report a vulnerability</a></li>
+      <li><a href="https://docs.bitcoinuniverse.io">Bitcoin Universe documentation portal</a></li>
+      <li><a href="llms.txt">llms.txt</a></li>
+    </ul>
+    <p class="footer-note">Witness Circles is an original Bitcoin Universe protocol. It creates no token, no balance, no transferable asset and no market. A confirmed Circle proves that distinct Taproot output keys authorized one exact Bitcoin transaction, and nothing more. Code is MIT licensed; the specification and test vectors are dedicated under CC0 1.0.</p>
+  </div>
+</footer>
+</body>
+</html>
