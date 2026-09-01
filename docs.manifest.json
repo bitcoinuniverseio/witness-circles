@@ -4,7 +4,7 @@
   "name": "Witness Circles",
   "classification": "protocol",
   "repository": "bitcoinuniverseio/witness-circles",
-  "documentationUrl": "https://docs.bitcoinuniverse.io/protocols/witness-circles",
+  "documentationUrl": "https://docs.bitcoinuniverse.io/protocols/witness-circles/",
   "docsRoot": "docs",
   "sourceRef": "main",
   "lifecycle": "experimental",
