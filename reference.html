@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Witness Circles reference: terminology, indexer semantics, limits</title>
+<meta name="description" content="Terminology, indexer confirmation and mempool and reorganization semantics, fee and size for every participant count, limitations, security notes and an implementation checklist.">
+<link rel="canonical" href="https://bitcoinuniverseio.github.io/witness-circles/reference.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Witness Circles protocol documentation">
+<meta property="og:title" content="Witness Circles reference">
+<meta property="og:description" content="Terminology, indexer confirmation and mempool and reorganization semantics, fee and size for every participant count, limitations, security notes and an implementation checklist.">
+<meta property="og:url" content="https://bitcoinuniverseio.github.io/witness-circles/reference.html">
+<meta property="og:image" content="https://bitcoinuniverseio.github.io/witness-circles/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Concentric rings with member nodes joined by attestation arcs around a WITC marker">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Witness Circles reference">
+<meta name="twitter:description" content="Terminology, indexer confirmation and mempool and reorganization semantics, fee and size for every participant count, limitations, security notes and an implementation checklist.">
+<meta name="twitter:image" content="https://bitcoinuniverseio.github.io/witness-circles/assets/og-card.png">
+<meta name="theme-color" content="#070c10" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f5f8f9" media="(prefers-color-scheme: light)">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14" fill="none" stroke="var(--dim)" stroke-width="1.5"/><circle cx="16" cy="16" r="9" fill="none" stroke="var(--accent)" stroke-width="2.5"/><circle cx="16" cy="2.5" r="2.6" fill="var(--accent)"/><circle cx="28" cy="23" r="2.6" fill="var(--accent)"/><circle cx="4" cy="23" r="2.6" fill="var(--accent)"/></svg><span>Witness Circles<small>WITC protocol</small></span></a>
+    <div class="search">
+      <label class="sr-only" for="site-search">Search this documentation</label>
+      <input id="site-search" type="search" placeholder="Search (press /)" autocomplete="off" data-search-input data-search-base="" aria-describedby="search-hint">
+      <ul class="search-results" data-search-results aria-live="polite"></ul>
+    </div>
+    <div class="header-tools">
+      <button class="icon-button" type="button" data-theme-toggle aria-pressed="false">Light theme</button>
+      <button class="nav-toggle" type="button" data-nav-toggle aria-controls="site-nav">Menu</button>
+    </div>
+    <nav class="site-nav" id="site-nav" data-nav aria-label="Documentation sections">
+      <a href="index.html">Overview</a>
+      <a href="specification.html">Specification</a>
+      <a href="guide.html">Guide</a>
+      <a href="reference.html" aria-current="page">Reference</a>
+      <a href="test-vectors.html">Test vectors</a>
+      <a href="schemas.html">Schemas</a>
+      <a href="simulator.html">Simulator</a>
+      <a href="conformance.html">Conformance</a>
+      <a href="changelog.html">Changelog</a>
+    </nav>
+    <p id="search-hint" class="sr-only">Search requires JavaScript. Every page is linked from the navigation.</p>
+  </div>
+</header>
+<main id="main">
+<div class="shell">
+  <div class="page-head">
+    <p class="eyebrow">Reference</p>
+    <h1>Reference</h1>
+    <p class="lede">Definitions, indexing behaviour, sizing, limits and the checklist an implementation should be able to answer yes to.</p>
+  </div>
+  <div class="with-aside">
+  <aside class="page-aside">
+    <h2>On this page</h2>
+    <ol>
+      <li><a href="#terms">Terminology</a></li>
+      <li><a href="#indexer">Indexer semantics</a></li>
+      <li><a href="#sizes">Fees and sizes</a></li>
+      <li><a href="#limits">Limitations</a></li>
+      <li><a href="#security">Security considerations</a></li>
+      <li><a href="#checklist">Implementation checklist</a></li>
+    </ol>
+  </aside>
+  <div>
+
+  <h2 id="terms">Terminology</h2>
+  <dl class="terms">
+    <dt>Circle</dt><dd>One confirmed Bitcoin transaction that satisfies every rule in section 6 of the specification. It is the whole protocol object; there is no separate registration.</dd>
+    <dt>Marker</dt><dd>The 42 byte scriptPubKey at output 0: <code>OP_RETURN PUSH40</code> followed by the 40 byte WITC payload. Value must be zero.</dd>
+    <dt>Context hash</dt><dd>SHA-256 of the RFC 8785 serialization of the context manifest. Committed in the marker; the manifest itself never has to be published.</dd>
+    <dt>Participant count (N)</dt><dd>Declared in the marker and equal to the input count. Two to sixteen inclusive.</dd>
+    <dt>Slot</dt><dd>The zero-based position of a participant after inputs are sorted by display txid then vout. Slots determine successor vout and fee remainder assignment.</dd>
+    <dt>Successor</dt><dd>Output <code>slot + 1</code>, carrying the exact scriptPubKey of the corresponding input and the input value minus that slot's fee share.</dd>
+    <dt>Shard</dt><dd>A successor output tracked in protocol state. A shard is active until something spends it.</dd>
+    <dt>Lineage</dt><dd>The chain of shards that starts at a participant's first Circle input. Identified by <code>SHA256("WITC/lineage/v1" || wire_outpoint)</code> of the genesis outpoint. A lineage is active or closed, never merged.</dd>
+    <dt>Continuation edge</dt><dd>A recorded link from an earlier Circle to a later one, for one lineage, through the shard the later Circle spent.</dd>
+    <dt>Ordinary spend</dt><dd>Any confirmed transaction that spends an active shard without being a valid Circle. It closes that lineage.</dd>
+    <dt>Revision</dt><dd>A counter that increments once per confirmed transaction that applies a Circle or closes at least one active lineage. Rollback decrements it by restoring the prior snapshot.</dd>
+    <dt>State hash</dt><dd><code>SHA256(UTF8(RFC8785(snapshot)))</code> over the exact snapshot object, with the ordering rules of section 11 applied first.</dd>
+  </dl>
+
+  <h2 id="indexer">Indexer semantics</h2>
+  <h3>Confirmation</h3>
+  <p>A Circle becomes authoritative at <strong>one confirmation</strong> in the best chain. There is no maturity period, no second protocol state, and no probabilistic threshold in the protocol itself. A product may render six confirmations as a settled display state, but that is presentation, not a transition. Nothing in the state snapshot changes between confirmation one and confirmation six.</p>
+  <p>An indexer applies confirmed transactions in the order they appear in the block, inside one database transaction per block. Jobs must be idempotent by block hash, txid and parser version.</p>
+  <h3>Mempool</h3>
+  <p>Mempool observations are provisional and node-local. Two honest nodes can disagree about them at the same instant, so they are not protocol state.</p>
+  <ul>
+    <li>An indexer MAY expose pending valid candidates, conflicts, replacements and eviction.</li>
+    <li>These projections MUST live in separate tables or namespaces and MUST be removable without editing confirmed state.</li>
+    <li>A pending candidate never contributes to the state hash and never advances a revision.</li>
+    <li>Because a Circle signals opt-in RBF, a replacement is possible, but it requires fresh signatures from every participant. A single participant cannot replace, cancel, or fee-bump the transaction alone, and there is no CPFP workflow.</li>
+  </ul>
+  <h3>Reorganizations</h3>
+  <p>An indexer MUST persist block hashes and enough undo information to reverse what it applied. On detecting that the indexed tip no longer matches Bitcoin Core:</p>
+  <ol>
+    <li>Reverse confirmed transitions in reverse transaction order, block by block, until the common ancestor.</li>
+    <li>Each reversal restores the exact prior snapshot, so the state hash after reversing to a given point equals the state hash that was published at that point.</li>
+    <li>Ingest the new branch in block order, then in the order transactions appear within each block.</li>
+  </ol>
+  <p>The reference engine implements this as a journal of prior snapshots with <code>rollbackLast(expectedTxid)</code>, which refuses to roll back a transaction other than the journal tip. The published lifecycle vector commits all three rollback roots, so a reorganization implementation can be tested without a chain.</p>
+  <div class="note"><p><strong>The rule that catches people out.</strong> A transaction that spends an active shard but fails Circle validation still closes that lineage, as an ordinary spend. This is deliberate: it makes lineage closure a property of the UTXO set rather than of parser opinion, so a later parser correction cannot resurrect a closed lineage. It also applies to a transaction using an unknown future protocol version.</p></div>
+  <h3>Determinism obligations</h3>
+  <ul>
+    <li>Never accept validity supplied by a frontend, and never let optional manifest fields enter state.</li>
+    <li>Verify the golden vector at startup and expose the parser version in status responses.</li>
+    <li>Cache keys should include network, indexed tip, parser version and query parameters.</li>
+    <li>A parser upgrade is replayed into shadow tables and compared by checksum before cutover. Historical meaning is never changed silently.</li>
+  </ul>
+
+  <h2 id="sizes">Fees and sizes for every participant count</h2>
+  <p>All values assume 64 byte <code>SIGHASH_DEFAULT</code> signatures. Explicit <code>SIGHASH_ALL</code> adds one witness byte per such input, which can add at most one virtual byte for every four such inputs.</p>
+  <div class="scroll-x"><table>
+    <thead><tr><th scope="col" class="num">N</th><th scope="col" class="num">Weight</th><th scope="col" class="num">Virtual bytes</th><th scope="col" class="num">Fee at 1 sat/vB</th><th scope="col" class="num">Fee at 10 sat/vB</th><th scope="col" class="num">Per member at 10 sat/vB</th></tr></thead>
+    <tbody>
+      <tr><th scope="row" class="num">2</th><td class="num">1,050</td><td class="num">263</td><td class="num">263</td><td class="num">2,630</td><td class="num">1,315</td></tr>
+      <tr><th scope="row" class="num">3</th><td class="num">1,452</td><td class="num">363</td><td class="num">363</td><td class="num">3,630</td><td class="num">1,210</td></tr>
+      <tr><th scope="row" class="num">4</th><td class="num">1,854</td><td class="num">464</td><td class="num">464</td><td class="num">4,640</td><td class="num">1,160</td></tr>
+      <tr><th scope="row" class="num">5</th><td class="num">2,256</td><td class="num">564</td><td class="num">564</td><td class="num">5,640</td><td class="num">1,128</td></tr>
+      <tr><th scope="row" class="num">6</th><td class="num">2,658</td><td class="num">665</td><td class="num">665</td><td class="num">6,650</td><td class="num">1,109 or 1,108</td></tr>
+      <tr><th scope="row" class="num">7</th><td class="num">3,060</td><td class="num">765</td><td class="num">765</td><td class="num">7,650</td><td class="num">1,093 or 1,092</td></tr>
+      <tr><th scope="row" class="num">8</th><td class="num">3,462</td><td class="num">866</td><td class="num">866</td><td class="num">8,660</td><td class="num">1,083 or 1,082</td></tr>
+      <tr><th scope="row" class="num">9</th><td class="num">3,864</td><td class="num">966</td><td class="num">966</td><td class="num">9,660</td><td class="num">1,074 or 1,073</td></tr>
+      <tr><th scope="row" class="num">10</th><td class="num">4,266</td><td class="num">1,067</td><td class="num">1,067</td><td class="num">10,670</td><td class="num">1,067</td></tr>
+      <tr><th scope="row" class="num">11</th><td class="num">4,668</td><td class="num">1,167</td><td class="num">1,167</td><td class="num">11,670</td><td class="num">1,061 or 1,060</td></tr>
+      <tr><th scope="row" class="num">12</th><td class="num">5,070</td><td class="num">1,268</td><td class="num">1,268</td><td class="num">12,680</td><td class="num">1,057 or 1,056</td></tr>
+      <tr><th scope="row" class="num">13</th><td class="num">5,472</td><td class="num">1,368</td><td class="num">1,368</td><td class="num">13,680</td><td class="num">1,053 or 1,052</td></tr>
+      <tr><th scope="row" class="num">14</th><td class="num">5,874</td><td class="num">1,469</td><td class="num">1,469</td><td class="num">14,690</td><td class="num">1,050 or 1,049</td></tr>
+      <tr><th scope="row" class="num">15</th><td class="num">6,276</td><td class="num">1,569</td><td class="num">1,569</td><td class="num">15,690</td><td class="num">1,046</td></tr>
+      <tr><th scope="row" class="num">16</th><td class="num">6,678</td><td class="num">1,670</td><td class="num">1,670</td><td class="num">16,700</td><td class="num">1,044 or 1,043</td></tr>
+    </tbody>
+  </table></div>
+  <p>Minimum viable input value is the fee share plus 1,000 sats. At 10 sat/vB in a sixteen member Circle that is 1,044 + 1,000 = 2,044 sats, so small inputs are usable, but a fee spike can push a planned Circle under the dust rule and the planner will refuse it rather than produce an invalid transaction.</p>
+
+  <h2 id="limits">Limitations</h2>
+  <ul>
+    <li><strong>No privacy.</strong> A Circle deliberately links every participating input, and every same-key continuation, in public forever. This is the feature and the risk.</li>
+    <li><strong>No identity.</strong> One person can hold sixteen keys. Nothing in the protocol can detect that, and no application should claim otherwise.</li>
+    <li><strong>No fee bump.</strong> No CPFP workflow, no unilateral RBF, no cancellation after broadcast.</li>
+    <li><strong>No relay guarantee.</strong> Policy acceptance is a Bitcoin Core question. Call <code>testmempoolaccept</code> before broadcasting.</li>
+    <li><strong>No mainnet creation.</strong> The reference planner and marker encoder fail closed outside Signet and regtest.</li>
+    <li><strong>No asset.</strong> No token, balance, supply, price, transfer, deposit or market. Active shards must never be treated as exchange deposit identifiers or listable items.</li>
+    <li><strong>No second operation.</strong> Only <code>CIRCLE</code> exists. Refuel, rekey, transfer and governance operations are reserved and must be rejected, not guessed.</li>
+    <li><strong>Sixteen participants maximum.</strong> The count is a single payload byte bounded at 16, and the transaction cost grows linearly with it.</li>
+  </ul>
+
+  <h2 id="security">Security considerations</h2>
+  <h3>For participants</h3>
+  <ul>
+    <li>Every input you contribute is permanently and publicly associated with every other input in the Circle, including any later Circle that continues one of those lineages.</li>
+    <li>A signature commits to all inputs and all outputs. Verify the whole transaction, not just your own row, before signing.</li>
+    <li>Verify the fee share and the total fee against your own caps. The protocol defines no maximum fee.</li>
+    <li>An invitation is a capability, not an identity. Bind it to session, slot, outpoint, context hash and fee caps, and let it expire.</li>
+  </ul>
+  <h3>For wallets</h3>
+  <ul>
+    <li>Rebuild or decode the unsigned transaction locally. Do not trust a coordinator's summary.</li>
+    <li>Compare the frozen unsigned transaction against the invitation fingerprint before displaying anything.</li>
+    <li>Disclose Taproot key origin data only for the owner's own input. Never attach a global xpub.</li>
+    <li>Return a non-finalized <code>PSBT_IN_TAP_KEY_SIG</code>. Wallets that auto-finalize or hide outputs are unsafe here until tested.</li>
+    <li>Protect active shards from automatic coin selection.</li>
+  </ul>
+  <h3>For indexers and applications</h3>
+  <ul>
+    <li>Treat manifest titles, aliases, descriptions and renderer strings as untrusted input. Escape them. Never interpret an alias as an identity.</li>
+    <li>Do not log authorization capabilities, full participant PSBTs, derivation paths, seeds or keys.</li>
+    <li>Bound and paginate graph traversal over lineages and edges; a Circle graph is attacker-influenceable in size.</li>
+    <li>Compare state hashes between independent instances and alert on disagreement.</li>
+    <li>A coordinator must never store a private key or seed phrase.</li>
+  </ul>
+  <p>Report vulnerabilities privately through <a href="https://github.com/bitcoinuniverseio/witness-circles/security/policy">GitHub private vulnerability reporting</a> on the owning repository. Do not open a public issue for an unpatched fund-loss finding.</p>
+
+  <h2 id="checklist">Implementation checklist</h2>
+  <p>An implementation that can answer yes to all of these interoperates with the reference.</p>
+  <h3>Parser</h3>
+  <ul class="checklist">
+    <li>Rejects <code>PUSHDATA1</code> markers with <code>AMBIGUOUS_ENCODING</code> rather than accepting them.</li>
+    <li>Enforces minimal CompactSize on every count and length.</li>
+    <li>Rejects trailing bytes after the locktime with <code>TRAILING_DATA</code>.</li>
+    <li>Rejects a SegWit marker and flag when no input carries witness data.</li>
+    <li>Rejects a zero context hash and any operation byte other than <code>0x01</code>.</li>
+  </ul>
+  <h3>Validator</h3>
+  <ul class="checklist">
+    <li>Checks all seventeen grammar rules and reports the same verdict as the reference on every published vector.</li>
+    <li>Verifies each BIP340 key-path signature against the BIP341 message for its input.</li>
+    <li>Accepts a 65 byte signature only when the final byte is exactly <code>0x01</code>.</li>
+    <li>Recomputes the fee allocation instead of trusting output values.</li>
+    <li>Uses checked integer arithmetic and enforces <code>MAX_MONEY</code> on individual and aggregate values.</li>
+  </ul>
+  <h3>State</h3>
+  <ul class="checklist">
+    <li>Derives lineage identifiers from the genesis outpoint in wire form.</li>
+    <li>Applies the ordering rules of section 11 before hashing.</li>
+    <li>Reproduces the empty-state hash and all three published transition hashes.</li>
+    <li>Reproduces all three published rollback roots in reverse order.</li>
+    <li>Closes a lineage on any confirmed non-Circle spend of an active shard.</li>
+    <li>Keeps mempool projections outside the hashed snapshot.</li>
+  </ul>
+  <h3>Product</h3>
+  <ul class="checklist">
+    <li>Displays the claim boundary wherever a Circle is presented.</li>
+    <li>Escapes every manifest string before rendering.</li>
+    <li>Provides a text alternative for every circle visualization.</li>
+    <li>Exposes the parser version alongside any derived state.</li>
+  </ul>
+  </div>
+  </div>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="shell">
+    <dl class="footer-meta">
+      <div><dt>Owning repository</dt><dd><a href="https://github.com/bitcoinuniverseio/witness-circles">bitcoinuniverseio/witness-circles</a></dd></div>
+      <div><dt>Source path</dt><dd><code>docs/developers/architecture.md, src/state.ts</code></dd></div>
+      <div><dt>Specification version</dt><dd>1.0.0</dd></div>
+      <div><dt>Lifecycle</dt><dd>Experimental</dd></div>
+      <div><dt>Chain and networks</dt><dd>Bitcoin. Signet and regtest for creation, all four network identifiers for parsing.</dd></div>
+      <div><dt>Last verified</dt><dd><time datetime="2026-09-01">2026-09-01</time> at commit <code>6507df3848c9</code></dd></div>
+    </dl>
+    <ul class="footer-links">
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/edit/main/reference.html">Edit this page on GitHub</a></li>
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/blob/main/SPECIFICATION.md">Normative specification</a></li>
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/security/policy">Report a vulnerability</a></li>
+      <li><a href="https://docs.bitcoinuniverse.io">Bitcoin Universe documentation portal</a></li>
+      <li><a href="llms.txt">llms.txt</a></li>
+    </ul>
+    <p class="footer-note">Witness Circles is an original Bitcoin Universe protocol. It creates no token, no balance, no transferable asset and no market. A confirmed Circle proves that distinct Taproot output keys authorized one exact Bitcoin transaction, and nothing more. Code is MIT licensed; the specification and test vectors are dedicated under CC0 1.0.</p>
+  </div>
+</footer>
+</body>
+</html>

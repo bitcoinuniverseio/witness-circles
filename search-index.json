@@ -1,0 +1,1059 @@
+{
+ "site": "https://bitcoinuniverseio.github.io/witness-circles/",
+ "specVersion": "1.0.0",
+ "generated": "2026-09-01",
+ "entries": [
+  {
+   "url": "index.html",
+   "page": "Witness Circles",
+   "heading": "Witness Circles",
+   "text": "An original Bitcoin protocol for membership by mutual witnessing. Two to sixteen Taproot keys authorize one exact transaction, and the record exists only when the loop closes.",
+   "aliases": [
+    "WITC",
+    "witness circle",
+    "witnes circles",
+    "circle protocol",
+    "mutual witnessing",
+    "attestation"
+   ]
+  },
+  {
+   "url": "index.html#how-it-closes",
+   "page": "Witness Circles",
+   "heading": "How a circle closes",
+   "text": "Most membership systems record a claim and hope you trust the recorder. Witness Circles has no recorder. Each participant contributes one confirmed, dedicated Taproot input to a single transaction, and each participant g",
+   "aliases": [
+    "WITC",
+    "witness circle",
+    "witnes circles",
+    "circle protocol",
+    "mutual witnessing",
+    "attestation"
+   ]
+  },
+  {
+   "url": "index.html#claim",
+   "page": "Witness Circles",
+   "heading": "What a Circle proves, and what it does not",
+   "text": "It proves Distinct native P2TR output keys authorized one exact Bitcoin transaction under Taproot key-path signature rules, at a position in the best chain, committing to a shared context hash. It does not prove Human id",
+   "aliases": [
+    "WITC",
+    "witness circle",
+    "witnes circles",
+    "circle protocol",
+    "mutual witnessing",
+    "attestation"
+   ]
+  },
+  {
+   "url": "index.html#numbers",
+   "page": "Witness Circles",
+   "heading": "The protocol in six numbers",
+   "text": "2 to 16 independent output keys per Circle 42 bytes exact marker script, 6a28 plus a 40 byte payload 1,000 sats minimum successor output per member 246 + 402N weight units for 64 byte signatures 1 confirmation before a C",
+   "aliases": [
+    "WITC",
+    "witness circle",
+    "witnes circles",
+    "circle protocol",
+    "mutual witnessing",
+    "attestation"
+   ]
+  },
+  {
+   "url": "index.html#state",
+   "page": "Witness Circles",
+   "heading": "State is derived, never declared",
+   "text": "A Circle transaction creates one shard for each participant: the successor output that carries the same script as their input. The chain of shards that starts at a participant's first Circle is a lineage , identified by ",
+   "aliases": [
+    "WITC",
+    "witness circle",
+    "witnes circles",
+    "circle protocol",
+    "mutual witnessing",
+    "attestation"
+   ]
+  },
+  {
+   "url": "index.html#who",
+   "page": "Witness Circles",
+   "heading": "Who this is for",
+   "text": "Protocol implementers Write a second implementation. The specification is normative, the test vectors are binding, and conformance tells you exactly what must agree. Indexer operators Confirmation, mempool and reorganiza",
+   "aliases": [
+    "WITC",
+    "witness circle",
+    "witnes circles",
+    "circle protocol",
+    "mutual witnessing",
+    "attestation"
+   ]
+  },
+  {
+   "url": "index.html#status",
+   "page": "Witness Circles",
+   "heading": "Where this stands today",
+   "text": "Verified against this repository at commit 6507df3848c9 . Question Answer Lifecycle Experimental. The reference implementation is published for parser interoperability, wallet safety review and testing. Chain Bitcoin. Ne",
+   "aliases": [
+    "WITC",
+    "witness circle",
+    "witnes circles",
+    "circle protocol",
+    "mutual witnessing",
+    "attestation"
+   ]
+  },
+  {
+   "url": "index.html#entry",
+   "page": "Witness Circles",
+   "heading": "Entry points",
+   "text": "Source bitcoinuniverseio/witness-circles holds the specification, reference implementation, schemas and vectors. Portal This component is listed on the Bitcoin Universe documentation portal at docs.bitcoinuniverse.io/pro",
+   "aliases": [
+    "WITC",
+    "witness circle",
+    "witnes circles",
+    "circle protocol",
+    "mutual witnessing",
+    "attestation"
+   ]
+  },
+  {
+   "url": "specification.html",
+   "page": "Witness Circles specification",
+   "heading": "Witness Circles specification",
+   "text": "The normative WITC rules: marker encoding, context manifest, seventeen transaction grammar rules, fee allocation, lineages, state transitions, reorganizations and error codes.",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#boundary",
+   "page": "Witness Circles specification",
+   "heading": "1. Claim boundary",
+   "text": "A valid Circle establishes only that distinct native P2TR output keys authorized the exact transaction under Bitcoin's Taproot key-path signature rules. A compliant application MUST NOT present a Circle as proof of human",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#layers",
+   "page": "Witness Circles specification",
+   "heading": "2. Layers",
+   "text": "Bitcoin consensus determines whether the transaction and its inputs are valid in the best chain. Relay and miner policy determine whether an unconfirmed transaction propagates or is mined. This specification identifies a",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#networks",
+   "page": "Witness Circles specification",
+   "heading": "3. Network identifiers",
+   "text": "Byte Network Creation enabled 0x00 Bitcoin mainnet No 0x01 Bitcoin testnet3 No 0x02 Bitcoin Signet Yes 0x03 Bitcoin regtest Yes Other values are invalid for the protocol. The marker network MUST match the chain being ind",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#marker",
+   "page": "Witness Circles specification",
+   "heading": "4. Marker",
+   "text": "Output index 0 MUST have value zero and this exact script: OP_RETURN PUSH40 <40-byte payload> The byte serialization is 6a 28 <payload> , so the complete scriptPubKey is exactly 42 bytes. Offset Size Field Value 0 4 Magi",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#manifest",
+   "page": "Witness Circles specification",
+   "heading": "5. Context manifest",
+   "text": "The context manifest is a JSON object serialized with RFC 8785 (JCS) and committed as: context_hash = SHA256(UTF8(JCS(manifest))) Required fields are protocol , version , kind , nonce , title , created and expires . Opti",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#grammar",
+   "page": "Witness Circles specification",
+   "heading": "6. Transaction grammar",
+   "text": "A valid Circle MUST satisfy every rule below. The reference validator in src/validator.ts raises the named error code on the first rule that fails. nVersion is 2. nLockTime is 0. Every input nSequence is 0xfffffffd . The",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#fees",
+   "page": "Witness Circles specification",
+   "heading": "7. Fees and size",
+   "text": "The miner fee is split as evenly as integer arithmetic allows, with the remainder assigned to the lowest slots. Let F be the total fee and N the participant count: F = sum(input_values) - sum(outputs_1_through_N) q = flo",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#lineages",
+   "page": "Witness Circles specification",
+   "heading": "8. Lineages and shards",
+   "text": "For a valid Circle input that is not the current shard of an existing lineage: lineage_id = SHA256( UTF8(\"WITC/lineage/v1\") || wire_serialized_genesis_outpoint ) The outpoint uses Bitcoin wire form: reversed display txid",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#confirmation",
+   "page": "Witness Circles specification",
+   "heading": "9. Confirmation and mempool",
+   "text": "Mempool observations are provisional and node-local. An indexer MAY expose pending valid candidates, conflicts, replacements and eviction, but MUST keep these projections separate from confirmed authoritative state. A Ci",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#reorg",
+   "page": "Witness Circles specification",
+   "heading": "10. Reorganizations",
+   "text": "An indexer MUST store block hashes and sufficient undo information. When the indexed tip no longer matches Bitcoin Core, it MUST reverse confirmed transitions in reverse transaction order until the common ancestor, then ",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#determinism",
+   "page": "Witness Circles specification",
+   "heading": "11. Determinism and state",
+   "text": "CompactSize integers MUST be minimally encoded. Numeric calculations MUST use checked integer arithmetic. Transaction values MUST NOT exceed Bitcoin MAX_MONEY . Independent implementations MUST reproduce the committed te",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#upgrade",
+   "page": "Witness Circles specification",
+   "heading": "12. Upgrade policy",
+   "text": "New protocol behaviour requires a new version byte, a specification, a threat model, schemas, cross-language vectors, an activation policy and independent implementation review. Implementations MUST NOT reinterpret final",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#wallets",
+   "page": "Witness Circles specification",
+   "heading": "13. Wallet requirements",
+   "text": "Before signing, a wallet MUST independently verify every rule in section 6 plus: The owned outpoint appears exactly once. The displayed context serializes under RFC 8785 to the marker hash. The owned successor and its ex",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#errors",
+   "page": "Witness Circles specification",
+   "heading": "14. Error codes",
+   "text": "These are the stable codes exported by src/errors.ts . Implementations may use different messages, but a conforming implementation must reach the same valid or invalid verdict and should report the same code. Code Raised",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "specification.html#reference-status",
+   "page": "Witness Circles specification",
+   "heading": "15. Reference status",
+   "text": "This repository is a reference implementation, not Bitcoin consensus software. Bitcoin Core remains authoritative for Bitcoin validity and local policy acceptance. Applications SHOULD call testmempoolaccept immediately b",
+   "aliases": [
+    "spec",
+    "normative",
+    "grammar",
+    "marker",
+    "OP_RETURN",
+    "sighash",
+    "BIP341",
+    "BIP340",
+    "RFC 8785",
+    "JCS"
+   ]
+  },
+  {
+   "url": "guide.html",
+   "page": "Witness Circles guide",
+   "heading": "Witness Circles guide",
+   "text": "A plain-language walkthrough of Witness Circles with three worked examples taken from the published vectors, plus an honest matrix of what supports the protocol today.",
+   "aliases": [
+    "tutorial",
+    "walkthrough",
+    "how to",
+    "worked example",
+    "psbt",
+    "coordinator",
+    "signing"
+   ]
+  },
+  {
+   "url": "guide.html#idea",
+   "page": "Witness Circles guide",
+   "heading": "The idea",
+   "text": "Imagine four people who want a durable record that they were all party to the same moment. They do not want a token, a website account, or a database row that someone can edit. Each of them puts one confirmed Taproot coi",
+   "aliases": [
+    "tutorial",
+    "walkthrough",
+    "how to",
+    "worked example",
+    "psbt",
+    "coordinator",
+    "signing"
+   ]
+  },
+  {
+   "url": "guide.html#lifecycle",
+   "page": "Witness Circles guide",
+   "heading": "Session lifecycle",
+   "text": "The protocol has nothing to say about how participants find each other. That is application territory. The reference implementation ships a planner that produces the frozen unsigned transaction, and a signing-intent insp",
+   "aliases": [
+    "tutorial",
+    "walkthrough",
+    "how to",
+    "worked example",
+    "psbt",
+    "coordinator",
+    "signing"
+   ]
+  },
+  {
+   "url": "guide.html#example-a",
+   "page": "Witness Circles guide",
+   "heading": "Example A: a genesis circle for three participants",
+   "text": "This is test-vectors/v1/golden-circle.json in full. Signet, block height 200, three participants who have never been in a Circle before. The context manifest {\"created\":\"2026-08-01T18:00:00Z\",\"expires\":\"2026-08-01T19:00:",
+   "aliases": [
+    "tutorial",
+    "walkthrough",
+    "how to",
+    "worked example",
+    "psbt",
+    "coordinator",
+    "signing"
+   ]
+  },
+  {
+   "url": "guide.html#example-b",
+   "page": "Witness Circles guide",
+   "heading": "Example B: two of the three come back",
+   "text": "At height 201 the holders of slots 0 and 1 form a second Circle by spending their successor shards from example A. This is the continuation section of state-lifecycle.json . Field Value Inputs 3703…0f65:1 (28,790) and 37",
+   "aliases": [
+    "tutorial",
+    "walkthrough",
+    "how to",
+    "worked example",
+    "psbt",
+    "coordinator",
+    "signing"
+   ]
+  },
+  {
+   "url": "guide.html#example-c",
+   "page": "Witness Circles guide",
+   "heading": "Example C: an ordinary spend ends a lineage",
+   "text": "At height 202 a transaction that is not a Circle spends f7c7…28ef:1 , one of the active shards. It might be the owner moving funds, paying someone, or consolidating. The protocol does not care what it was. That lineage b",
+   "aliases": [
+    "tutorial",
+    "walkthrough",
+    "how to",
+    "worked example",
+    "psbt",
+    "coordinator",
+    "signing"
+   ]
+  },
+  {
+   "url": "guide.html#support",
+   "page": "Witness Circles guide",
+   "heading": "What actually supports Witness Circles today",
+   "text": "Only claims that can be checked in Bitcoin Universe source code appear here. Component Status Evidence Reference SDK and CLI Available src/sdk.ts , src/cli.ts in this repository, package @bitcoinuniverse/witness-circles ",
+   "aliases": [
+    "tutorial",
+    "walkthrough",
+    "how to",
+    "worked example",
+    "psbt",
+    "coordinator",
+    "signing"
+   ]
+  },
+  {
+   "url": "guide.html#pitfalls",
+   "page": "Witness Circles guide",
+   "heading": "Common mistakes",
+   "text": "Using a wallet's change output as a participant input A Circle publicly links every participating input forever. Use a dedicated UTXO whose history you are willing to publish. Dedicated inputs reduce unrelated exposure; ",
+   "aliases": [
+    "tutorial",
+    "walkthrough",
+    "how to",
+    "worked example",
+    "psbt",
+    "coordinator",
+    "signing"
+   ]
+  },
+  {
+   "url": "reference.html",
+   "page": "Witness Circles reference",
+   "heading": "Witness Circles reference",
+   "text": "Terminology, indexer confirmation and mempool and reorganization semantics, fee and size for every participant count, limitations, security notes and an implementation checklist.",
+   "aliases": [
+    "glossary",
+    "terminology",
+    "indexer",
+    "reorg",
+    "reorganization",
+    "mempool",
+    "confirmation",
+    "rbf",
+    "vsize",
+    "fee rate",
+    "limits",
+    "security"
+   ]
+  },
+  {
+   "url": "reference.html#terms",
+   "page": "Witness Circles reference",
+   "heading": "Terminology",
+   "text": "Circle One confirmed Bitcoin transaction that satisfies every rule in section 6 of the specification. It is the whole protocol object; there is no separate registration. Marker The 42 byte scriptPubKey at output 0: OP_RE",
+   "aliases": [
+    "glossary",
+    "terminology",
+    "indexer",
+    "reorg",
+    "reorganization",
+    "mempool",
+    "confirmation",
+    "rbf",
+    "vsize",
+    "fee rate",
+    "limits",
+    "security"
+   ]
+  },
+  {
+   "url": "reference.html#indexer",
+   "page": "Witness Circles reference",
+   "heading": "Indexer semantics",
+   "text": "Confirmation A Circle becomes authoritative at one confirmation in the best chain. There is no maturity period, no second protocol state, and no probabilistic threshold in the protocol itself. A product may render six co",
+   "aliases": [
+    "glossary",
+    "terminology",
+    "indexer",
+    "reorg",
+    "reorganization",
+    "mempool",
+    "confirmation",
+    "rbf",
+    "vsize",
+    "fee rate",
+    "limits",
+    "security"
+   ]
+  },
+  {
+   "url": "reference.html#sizes",
+   "page": "Witness Circles reference",
+   "heading": "Fees and sizes for every participant count",
+   "text": "All values assume 64 byte SIGHASH_DEFAULT signatures. Explicit SIGHASH_ALL adds one witness byte per such input, which can add at most one virtual byte for every four such inputs. N Weight Virtual bytes Fee at 1 sat/vB F",
+   "aliases": [
+    "glossary",
+    "terminology",
+    "indexer",
+    "reorg",
+    "reorganization",
+    "mempool",
+    "confirmation",
+    "rbf",
+    "vsize",
+    "fee rate",
+    "limits",
+    "security"
+   ]
+  },
+  {
+   "url": "reference.html#limits",
+   "page": "Witness Circles reference",
+   "heading": "Limitations",
+   "text": "No privacy. A Circle deliberately links every participating input, and every same-key continuation, in public forever. This is the feature and the risk. No identity. One person can hold sixteen keys. Nothing in the proto",
+   "aliases": [
+    "glossary",
+    "terminology",
+    "indexer",
+    "reorg",
+    "reorganization",
+    "mempool",
+    "confirmation",
+    "rbf",
+    "vsize",
+    "fee rate",
+    "limits",
+    "security"
+   ]
+  },
+  {
+   "url": "reference.html#security",
+   "page": "Witness Circles reference",
+   "heading": "Security considerations",
+   "text": "For participants Every input you contribute is permanently and publicly associated with every other input in the Circle, including any later Circle that continues one of those lineages. A signature commits to all inputs ",
+   "aliases": [
+    "glossary",
+    "terminology",
+    "indexer",
+    "reorg",
+    "reorganization",
+    "mempool",
+    "confirmation",
+    "rbf",
+    "vsize",
+    "fee rate",
+    "limits",
+    "security"
+   ]
+  },
+  {
+   "url": "reference.html#checklist",
+   "page": "Witness Circles reference",
+   "heading": "Implementation checklist",
+   "text": "An implementation that can answer yes to all of these interoperates with the reference. Parser Rejects PUSHDATA1 markers with AMBIGUOUS_ENCODING rather than accepting them. Enforces minimal CompactSize on every count and",
+   "aliases": [
+    "glossary",
+    "terminology",
+    "indexer",
+    "reorg",
+    "reorganization",
+    "mempool",
+    "confirmation",
+    "rbf",
+    "vsize",
+    "fee rate",
+    "limits",
+    "security"
+   ]
+  },
+  {
+   "url": "test-vectors.html",
+   "page": "Witness Circles test vectors",
+   "heading": "Witness Circles test vectors",
+   "text": "The published Witness Circles vectors: marker cases with required error codes, a fully signed golden Signet transaction, and a three transition state lifecycle with rollback roots.",
+   "aliases": [
+    "vectors",
+    "fixtures",
+    "golden",
+    "state hash",
+    "rollback",
+    "differential testing"
+   ]
+  },
+  {
+   "url": "test-vectors.html#markers",
+   "page": "Witness Circles test vectors",
+   "heading": "Marker vectors",
+   "text": "File: test-vectors/v1/marker-vectors.json . One accepted encoding and three rejected ones, each pinned to the error code a conforming decoder must produce. Valid Name Script Decodes to signet-three-participant 6a28574954",
+   "aliases": [
+    "vectors",
+    "fixtures",
+    "golden",
+    "state hash",
+    "rollback",
+    "differential testing"
+   ]
+  },
+  {
+   "url": "test-vectors.html#golden",
+   "page": "Witness Circles test vectors",
+   "heading": "Golden circle vector",
+   "text": "File: test-vectors/v1/golden-circle.json . A complete, fully signed three participant Signet transaction with every derived value committed. Committed field Value network signet, currentBlockHeight 200 contextHash ad2608",
+   "aliases": [
+    "vectors",
+    "fixtures",
+    "golden",
+    "state hash",
+    "rollback",
+    "differential testing"
+   ]
+  },
+  {
+   "url": "test-vectors.html#lifecycle",
+   "page": "Witness Circles test vectors",
+   "heading": "State lifecycle vector",
+   "text": "File: test-vectors/v1/state-lifecycle.json . Three confirmed transitions and the three rollback roots, which together pin the entire state machine including reorganization behaviour. Step Event Effect on state Expected s",
+   "aliases": [
+    "vectors",
+    "fixtures",
+    "golden",
+    "state hash",
+    "rollback",
+    "differential testing"
+   ]
+  },
+  {
+   "url": "test-vectors.html#running",
+   "page": "Witness Circles test vectors",
+   "heading": "Running the vectors",
+   "text": "Against the reference implementation, from a clone of the repository: npm ci npm run build node dist/cli.js vectors verify # golden transaction and state lifecycle npm run verify # lint, types, tests, build, content and ",
+   "aliases": [
+    "vectors",
+    "fixtures",
+    "golden",
+    "state hash",
+    "rollback",
+    "differential testing"
+   ]
+  },
+  {
+   "url": "test-vectors.html#policy",
+   "page": "Witness Circles test vectors",
+   "heading": "Fixture policy",
+   "text": "Adding or changing a normative rule requires a vector that fails before the change and passes after it, plus an inverse invalid case where one applies. Vectors are versioned by directory ( v1 ). A new protocol version ge",
+   "aliases": [
+    "vectors",
+    "fixtures",
+    "golden",
+    "state hash",
+    "rollback",
+    "differential testing"
+   ]
+  },
+  {
+   "url": "schemas.html",
+   "page": "Witness Circles JSON Schemas",
+   "heading": "Witness Circles JSON Schemas",
+   "text": "All seven published Witness Circles JSON Schemas: context manifest, marker, prevouts, plan request, state snapshot, golden circle vector and state lifecycle vector.",
+   "aliases": [
+    "json schema",
+    "schema",
+    "contract",
+    "manifest schema",
+    "snapshot schema",
+    "2020-12"
+   ]
+  },
+  {
+   "url": "schemas.html#context-manifest",
+   "page": "Witness Circles JSON Schemas",
+   "heading": "Context manifest",
+   "text": "schemas/v1/context-manifest.schema.json The optional JSON object whose RFC 8785 serialization is hashed into the marker. Structural rules only; the reference validator adds the semantic rules in section 5. Required: prot",
+   "aliases": [
+    "json schema",
+    "schema",
+    "contract",
+    "manifest schema",
+    "snapshot schema",
+    "2020-12"
+   ]
+  },
+  {
+   "url": "schemas.html#marker",
+   "page": "Witness Circles JSON Schemas",
+   "heading": "Decoded marker",
+   "text": "schemas/v1/marker.schema.json The shape of a decoded marker, for interchange between tools that do not share a language. Required: magic, version, network, networkId, opcode, participantCount, contextHash magic is the co",
+   "aliases": [
+    "json schema",
+    "schema",
+    "contract",
+    "manifest schema",
+    "snapshot schema",
+    "2020-12"
+   ]
+  },
+  {
+   "url": "schemas.html#prevouts",
+   "page": "Witness Circles JSON Schemas",
+   "heading": "Validation prevouts",
+   "text": "schemas/v1/prevouts.schema.json The confirmed previous outputs a validator needs. Without these a Circle cannot be checked, because values, scripts and heights are not in the transaction. Required: txid, vout, valueSats,",
+   "aliases": [
+    "json schema",
+    "schema",
+    "contract",
+    "manifest schema",
+    "snapshot schema",
+    "2020-12"
+   ]
+  },
+  {
+   "url": "schemas.html#plan-request",
+   "page": "Witness Circles JSON Schemas",
+   "heading": "Plan request",
+   "text": "schemas/v1/plan-request.schema.json Input to the reference planner: what a coordinator submits to produce a frozen unsigned transaction. Required: network, manifest, participants, feeRateSatsPerVbyte network is restricte",
+   "aliases": [
+    "json schema",
+    "schema",
+    "contract",
+    "manifest schema",
+    "snapshot schema",
+    "2020-12"
+   ]
+  },
+  {
+   "url": "schemas.html#state-snapshot",
+   "page": "Witness Circles JSON Schemas",
+   "heading": "State snapshot",
+   "text": "schemas/v1/state-snapshot.schema.json The exact object that is hashed to produce the authoritative state hash. This is the interoperability contract between independent indexers. Required: protocol, version, revision, li",
+   "aliases": [
+    "json schema",
+    "schema",
+    "contract",
+    "manifest schema",
+    "snapshot schema",
+    "2020-12"
+   ]
+  },
+  {
+   "url": "schemas.html#golden-circle",
+   "page": "Witness Circles JSON Schemas",
+   "heading": "Golden transaction vector",
+   "text": "schemas/v1/golden-circle.schema.json The shape of the golden vector file, so the fixture itself is validated in CI and cannot drift into an unparseable form. Required: 16 fields including rawTransaction, txid, wtxid, fee",
+   "aliases": [
+    "json schema",
+    "schema",
+    "contract",
+    "manifest schema",
+    "snapshot schema",
+    "2020-12"
+   ]
+  },
+  {
+   "url": "schemas.html#state-lifecycle",
+   "page": "Witness Circles JSON Schemas",
+   "heading": "State lifecycle vector",
+   "text": "schemas/v1/state-lifecycle.schema.json The shape of the lifecycle fixture: genesis reference, continuation circle, ordinary-spend closure, and exactly three rollback roots. Required: schemaVersion, name, genesis, continu",
+   "aliases": [
+    "json schema",
+    "schema",
+    "contract",
+    "manifest schema",
+    "snapshot schema",
+    "2020-12"
+   ]
+  },
+  {
+   "url": "schemas.html#ids",
+   "page": "Witness Circles JSON Schemas",
+   "heading": "Identifiers and versioning",
+   "text": "Each schema declares an $id under https://schemas.bitcoinuniverse.dev/witc/v1/ . Those identifiers are stable names used for $ref resolution between the files; resolve them from the repository copies rather than expectin",
+   "aliases": [
+    "json schema",
+    "schema",
+    "contract",
+    "manifest schema",
+    "snapshot schema",
+    "2020-12"
+   ]
+  },
+  {
+   "url": "simulator.html",
+   "page": "Circle state simulator",
+   "heading": "Circle state simulator",
+   "text": "Build a circle in the browser, watch its derived state change, see exactly when it closes and when it does not, and replay the published Witness Circles test vectors locally.",
+   "aliases": [
+    "simulator",
+    "tool",
+    "decoder",
+    "validator",
+    "playground",
+    "try it"
+   ]
+  },
+  {
+   "url": "simulator.html#builder",
+   "page": "Circle state simulator",
+   "heading": "Build a circle",
+   "text": "The builder starts loaded with the published golden Signet vector: three members, 30,000, 40,000 and 50,000 sats, at 10 sat/vB. Change anything and the verdict updates immediately. Network Signet regtest Fee rate (sat/vB",
+   "aliases": [
+    "simulator",
+    "tool",
+    "decoder",
+    "validator",
+    "playground",
+    "try it"
+   ]
+  },
+  {
+   "url": "simulator.html#decoder",
+   "page": "Circle state simulator",
+   "heading": "Decode a marker",
+   "text": "Paste a 42 byte marker scriptPubKey as hex. Invalid encodings are reported with the same error code the reference decoder raises. Marker scriptPubKey (hex) Load the valid vector Load the PUSHDATA1 case Load",
+   "aliases": [
+    "simulator",
+    "tool",
+    "decoder",
+    "validator",
+    "playground",
+    "try it"
+   ]
+  },
+  {
+   "url": "simulator.html#replay",
+   "page": "Circle state simulator",
+   "heading": "Replay the published vectors",
+   "text": "This reads test-vectors/v1/ from this site, decodes the real signed transactions, and reproduces every committed value: txids, wtxids, fee, virtual size, lineage identifiers, all three state hashes and all three rollback",
+   "aliases": [
+    "simulator",
+    "tool",
+    "decoder",
+    "validator",
+    "playground",
+    "try it"
+   ]
+  },
+  {
+   "url": "conformance.html",
+   "page": "Witness Circles conformance",
+   "heading": "Witness Circles conformance",
+   "text": "What a conforming Witness Circles implementation must reproduce: three levels, what must agree, the differential testing procedure and a self-declaration template.",
+   "aliases": [
+    "conformance",
+    "interop",
+    "interoperability",
+    "compliance",
+    "differential"
+   ]
+  },
+  {
+   "url": "conformance.html#levels",
+   "page": "Witness Circles conformance",
+   "heading": "Three levels",
+   "text": "Level 1: parser Decodes Bitcoin transactions strictly and decodes the WITC marker. Reproduces the marker vectors, including all three rejections. Does not need prevouts, signatures or state. Level 2: validator Everything",
+   "aliases": [
+    "conformance",
+    "interop",
+    "interoperability",
+    "compliance",
+    "differential"
+   ]
+  },
+  {
+   "url": "conformance.html#must",
+   "page": "Witness Circles conformance",
+   "heading": "What must agree, and what may differ",
+   "text": "Must agree exactly May differ The valid or invalid verdict on every input Error message wording and language The published error code for each invalid case Exception type, error hierarchy, logging txid, wtxid, weight and",
+   "aliases": [
+    "conformance",
+    "interop",
+    "interoperability",
+    "compliance",
+    "differential"
+   ]
+  },
+  {
+   "url": "conformance.html#procedure",
+   "page": "Witness Circles conformance",
+   "heading": "Differential testing procedure",
+   "text": "Parse the raw transaction in golden-circle.json without using this repository's SDK. Load the three listed prevouts. Verify every BIP341 key-path signature. Reproduce the marker fields, fee shares, txid, wtxid, virtual s",
+   "aliases": [
+    "conformance",
+    "interop",
+    "interoperability",
+    "compliance",
+    "differential"
+   ]
+  },
+  {
+   "url": "conformance.html#declaration",
+   "page": "Witness Circles conformance",
+   "heading": "Self-declaration template",
+   "text": "There is no certification body and no registry of implementations. Publish a declaration next to your source so that others can check it themselves. Implementation: <name> Language and runtime: <for example Rust 1.9x> Sp",
+   "aliases": [
+    "conformance",
+    "interop",
+    "interoperability",
+    "compliance",
+    "differential"
+   ]
+  },
+  {
+   "url": "conformance.html#changes",
+   "page": "Witness Circles conformance",
+   "heading": "Changing a rule",
+   "text": "The rules on this site are final for protocol version 0x01 . New behaviour requires a new version byte with its own specification, threat model, schemas, cross-language vectors, activation policy and independent review. ",
+   "aliases": [
+    "conformance",
+    "interop",
+    "interoperability",
+    "compliance",
+    "differential"
+   ]
+  },
+  {
+   "url": "changelog.html",
+   "page": "Witness Circles changelog",
+   "heading": "Witness Circles changelog",
+   "text": "Version history for the Witness Circles specification, the reference implementation and this documentation site, including the versioning policy for each.",
+   "aliases": [
+    "changelog",
+    "history",
+    "versions",
+    "releases"
+   ]
+  },
+  {
+   "url": "changelog.html#site-2026-09-01",
+   "page": "Witness Circles changelog",
+   "heading": "Documentation site, 2026-09-01",
+   "text": "Specification 1.0.0. Verified at commit 6507df3848c9 . Added Independent documentation site published from the repository root, replacing the previous marketing-oriented site under site/ . Complete normative specificatio",
+   "aliases": [
+    "changelog",
+    "history",
+    "versions",
+    "releases"
+   ]
+  },
+  {
+   "url": "changelog.html#v0-1-0",
+   "page": "Witness Circles changelog",
+   "heading": "Reference implementation 0.1.0, 2026-08-01",
+   "text": "Added Complete CIRCLE protocol specification. Exact marker and RFC 8785 manifest utilities. Strict Bitcoin transaction codec with minimal CompactSize enforcement. BIP341 key-path sighash and BIP340 signature verification",
+   "aliases": [
+    "changelog",
+    "history",
+    "versions",
+    "releases"
+   ]
+  },
+  {
+   "url": "changelog.html#policy",
+   "page": "Witness Circles changelog",
+   "heading": "Versioning policy",
+   "text": "Protocol behaviour is versioned by the marker version byte. Version 0x01 is final and will not gain new operations. Schemas and vectors are versioned by directory. v1 files are never edited to describe new behaviour. The",
+   "aliases": [
+    "changelog",
+    "history",
+    "versions",
+    "releases"
+   ]
+  }
+ ]
+}
