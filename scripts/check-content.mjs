@@ -48,7 +48,7 @@ for (const path of files) {
       continue;
     const clean = target.split(/[?#]/, 1)[0];
     const destination = clean.startsWith("/")
-      ? resolve(root, "site", clean.slice(1))
+      ? resolve(root, clean.slice(1))
       : resolve(path, "..", clean);
     try {
       await stat(destination);

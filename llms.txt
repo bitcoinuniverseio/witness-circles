@@ -1,0 +1,45 @@
+# Witness Circles
+
+> Witness Circles (WITC) is an original Bitcoin Universe protocol for membership records established by mutual witnessing. Two to sixteen independent Taproot output keys authorize one exact Bitcoin transaction; each participant's coin returns to the same output key minus an equal share of the miner fee, and a 42 byte OP_RETURN marker commits the participant count and a context hash. A circle's state is derived entirely from confirmed Bitcoin data.
+
+Specification version: 1.0.0. Protocol magic WITC, version byte 0x01, single operation CIRCLE (0x01).
+Lifecycle: experimental. Creation is enabled only on Signet and regtest; all four network identifiers (mainnet, testnet3, signet, regtest) are parseable.
+Owning repository: https://github.com/bitcoinuniverseio/witness-circles
+Portal entry: https://docs.bitcoinuniverse.io/protocols/witness-circles
+Verified at commit 6507df3848c9f44959ae5e40afa7c75fb55605df on 2026-09-01.
+
+There is no token, balance, transferable asset, transfer operation or market. Witness Circles has no entry in the Bitcoin Universe marketplace protocol registry, and no Bitcoin Universe product implements a trade path for it. No wallet integration is verified in Bitcoin Universe code. The protocol is indexed by https://github.com/bitcoinuniverseio/index-witness-circles.
+
+## Documentation
+
+- [Overview](https://bitcoinuniverseio.github.io/witness-circles/): what the protocol is, what a Circle proves and does not prove, the protocol in six numbers, lifecycle and support status.
+- [Specification](https://bitcoinuniverseio.github.io/witness-circles/specification.html): normative rules. Claim boundary, layers, network identifiers, the 40 byte marker payload layout, the context manifest and RFC 8785 commitment, the seventeen transaction grammar rules, fee allocation and size formulas, lineages and shards, confirmation and mempool, reorganizations, the state snapshot and state hash, upgrade policy, wallet requirements and the 36 stable error codes.
+- [Guide](https://bitcoinuniverseio.github.io/witness-circles/guide.html): plain-language walkthrough of the session lifecycle plus three worked examples taken from the committed vectors, a genesis circle, a continuation, and an ordinary spend that closes a lineage, with an honest support matrix.
+- [Reference](https://bitcoinuniverseio.github.io/witness-circles/reference.html): terminology, indexer semantics for confirmation, mempool and reorganization, fee and virtual size for every participant count from 2 to 16, limitations, security considerations, and an implementation checklist.
+- [Test vectors](https://bitcoinuniverseio.github.io/witness-circles/test-vectors.html): the published valid and invalid cases with required error codes, the golden signed Signet transaction, and the three transition state lifecycle with its rollback roots.
+- [Schemas](https://bitcoinuniverseio.github.io/witness-circles/schemas.html): all seven published JSON Schema 2020-12 contracts.
+- [Simulator](https://bitcoinuniverseio.github.io/witness-circles/simulator.html): a client-side circle state simulator and marker decoder that replays every published vector in the browser.
+- [Conformance](https://bitcoinuniverseio.github.io/witness-circles/conformance.html): three implementation levels, what must agree, the differential procedure and a self-declaration template.
+- [Changelog](https://bitcoinuniverseio.github.io/witness-circles/changelog.html): specification and documentation version history.
+
+## Machine-readable
+
+- [Search index](https://bitcoinuniverseio.github.io/witness-circles/search-index.json): every heading with its anchor and a text snippet.
+- [Golden circle vector](https://bitcoinuniverseio.github.io/witness-circles/test-vectors/v1/golden-circle.json)
+- [Marker vectors](https://bitcoinuniverseio.github.io/witness-circles/test-vectors/v1/marker-vectors.json)
+- [State lifecycle vector](https://bitcoinuniverseio.github.io/witness-circles/test-vectors/v1/state-lifecycle.json)
+- [JSON Schemas](https://bitcoinuniverseio.github.io/witness-circles/schemas/v1/)
+- [Documentation manifest](https://bitcoinuniverseio.github.io/witness-circles/docs.manifest.json)
+
+## Key facts
+
+- Participants per Circle: 2 to 16 inclusive.
+- Marker script: exactly 42 bytes, 6a28 followed by a 40 byte payload.
+- Minimum successor output: 1,000 satoshis.
+- Weight: 246 + 402N weight units for 64 byte signatures; virtual bytes are ceil(weight / 4).
+- Fee allocation: q = floor(F / N), and the first F mod N slots each pay one extra satoshi.
+- Lineage identifier: SHA256(UTF8("WITC/lineage/v1") || wire serialized genesis outpoint).
+- A Circle is authoritative at one confirmation. Six confirmations is a display convention only.
+- Any confirmed non-Circle spend of an active shard closes that lineage permanently.
+- Empty state hash: 90e749b7720fac379610d979e29998c7d650150548622f0a47d9d3e181f1be52
+- A Circle proves that distinct Taproot output keys authorized one exact transaction. It does not prove identity, personhood, attendance, friendship, endorsement, or one key per person.
