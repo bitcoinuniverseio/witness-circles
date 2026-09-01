@@ -2,6 +2,8 @@
 
 Version: 1.0.0
 
+Published documentation: https://bitcoinuniverseio.github.io/witness-circles/
+
 Protocol magic: `WITC`
 
 Operation: `CIRCLE` (`0x01`)
@@ -69,7 +71,7 @@ The byte serialization is:
 
 ## 5. Context manifest
 
-The context manifest is JSON authoritativeized with RFC 8785 JSON Authoritativeization Scheme and hashed as:
+The context manifest is a JSON object serialized with RFC 8785 (JCS) and hashed as:
 
 ```text
 context_hash = SHA256(UTF8(JCS(manifest)))
@@ -83,7 +85,7 @@ Aliases are untrusted labels. Applications MUST escape them and MUST NOT interpr
 
 Schema string limits count Unicode code points, matching JSON Schema 2020-12. Every string MUST contain well-formed Unicode without unpaired surrogates. It MUST be unchanged by the ECMAScript `TrimString` operation used by `String.prototype.trim`, so leading or trailing ECMAScript whitespace is invalid. RFC 8785 preserves string code points without Unicode normalization. `created` and `expires` MUST be real RFC 3339 UTC timestamps ending in `Z`, and `expires` MUST be later than `created`. Alias keys MUST be 32 bytes of lowercase hex and MUST be unique within the manifest. These semantic rules are enforced by the reference validator in addition to the published structural schema.
 
-## 6. Authoritative transaction grammar
+## 6. Transaction grammar
 
 A valid Circle MUST satisfy every rule:
 
@@ -151,7 +153,7 @@ Each Circle creates one successor shard for each lineage. A valid later Circle c
 
 A consensus-valid transaction that spends an active shard without satisfying every Circle rule closes that lineage. The Bitcoin is not burned by the protocol. Historical Circles remain part of the best-chain record.
 
-The final protocol has no transfer, split, merge, rekey, refuel, mint, market, burn, reward, governance, or administrative operation.
+The protocol has no transfer, split, merge, rekey, refuel, mint, market, burn, reward, governance, or administrative operation.
 
 ## 9. Confirmation and mempool
 
@@ -175,7 +177,7 @@ Independent implementations MUST reproduce the [committed test vectors](test-vec
 
 The authoritative confirmed-state snapshot is the exact object defined by the [state-snapshot schema](schemas/v1/state-snapshot.schema.json). `revision` starts at zero and increments once for each confirmed transaction that either applies a valid Circle or closes at least one active lineage through an ordinary spend. It does not increment for unrelated transactions or invalid candidates that close no active lineage. Rollback restores the prior revision.
 
-Every JSON numeric field in the snapshot MUST be a nonnegative ECMAScript safe integer, except `circleCount`, which MUST also be at least one. Every display outpoint MUST use lowercase txid hex and an authoritative decimal `vout` from 0 through 4294967295. Every satoshi string MUST be authoritative unsigned decimal from zero through Bitcoin `MAX_MONEY`.
+Every JSON numeric field in the snapshot MUST be a nonnegative ECMAScript safe integer, except `circleCount`, which MUST also be at least one. Every display outpoint MUST use lowercase txid hex and an exact decimal `vout` from 0 through 4294967295. Every satoshi string MUST be an exact unsigned decimal, with no leading zero, from zero through Bitcoin `MAX_MONEY`.
 
 Before hashing, implementations MUST order lowercase ASCII fields as follows:
 
@@ -198,7 +200,7 @@ Unknown versions and operations MAY be retained as uninterpreted candidates but 
 Before signing, a wallet MUST independently verify every rule in section 6 plus:
 
 - The owned outpoint appears exactly once.
-- The displayed context authoritativeizes to the marker hash.
+- The displayed context serializes under RFC 8785 to the marker hash.
 - The owned successor and exact fee share are visible.
 - Total fee and fee rate are within user-approved caps.
 - No global xpub, peer derivation path, or unnecessary proprietary PSBT field is disclosed.

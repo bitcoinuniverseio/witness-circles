@@ -1,10 +1,12 @@
 # Witness Circles
 
-Witness Circles is the final Bitcoin protocol for creating one exact, jointly authorized transaction across 2 to 16 independent Taproot output keys.
+**Documentation site: [bitcoinuniverseio.github.io/witness-circles](https://bitcoinuniverseio.github.io/witness-circles/)**
 
-Each participant contributes a confirmed, dedicated native P2TR input. A valid Circle returns each participant's Bitcoin to the same output key minus a deterministic equal fee share and commits to a shared context hash in a 42-byte `OP_RETURN` output.
+Witness Circles (`WITC`) is an original Bitcoin Universe protocol for membership records established by mutual witnessing. Two to sixteen independent Taproot output keys authorize one exact Bitcoin transaction. Each participant contributes a confirmed, dedicated native P2TR input, and each gets their Bitcoin back to the same output key minus a deterministic equal share of the miner fee. A 42-byte `OP_RETURN` output commits the participant count and a shared context hash.
 
-The defensible protocol claim is narrow:
+A circle's state is derived entirely from confirmed Bitcoin data. There is no server, no registry and no coordinator in the trust path.
+
+The defensible claim is narrow:
 
 > Distinct P2TR output keys jointly authorized this exact Bitcoin transaction.
 
@@ -12,22 +14,37 @@ It does not prove identity, attendance, friendship, intent outside the transacti
 
 ## Status
 
-The final protocol is suitable for parser interoperability, wallet safety review, regtest, and Signet testing. Planning and marker creation fail closed outside Signet and regtest. Mainnet and testnet3 identifiers remain parseable for read-only interoperability only.
+| Fact | Value |
+|---|---|
+| Specification version | 1.0.0, protocol version byte `0x01`, single operation `CIRCLE` (`0x01`) |
+| Lifecycle | Experimental |
+| Chain | Bitcoin |
+| Creation enabled on | Signet and regtest only. Planning and marker creation fail closed elsewhere. |
+| Parseable networks | mainnet (`0x00`), testnet3 (`0x01`), Signet (`0x02`), regtest (`0x03`) |
+| Package | `@bitcoinuniverse/witness-circles` 0.1.0, MIT |
+| Marketplace support | None. Witness Circles has no entry in the Bitcoin Universe marketplace protocol registry, and the protocol defines no transferable asset. |
+| Wallet support | No wallet integration is verified in Bitcoin Universe code. Requirements are specified in section 13. |
+| Indexing | [bitcoinuniverseio/index-witness-circles](https://github.com/bitcoinuniverseio/index-witness-circles), plus the reference state engine here. |
 
-Public source repository: [github.com/bitcoinuniverse/witness-circles](https://github.com/bitcoinuniverse/witness-circles)
-
-CI and manually requested package-candidate checks use PowerShell on the shared
-`universe-ci` pool. Certified Linux and Windows workers execute the same public
-artifact contract, and fork pull requests cannot use private runners.
-
-The final protocol supports only `CIRCLE`:
+The protocol supports only `CIRCLE`:
 
 - No protocol transfer operation
 - No marketplace or transferable asset
-- No protocol fee, token, reward, royalty, or auction
+- No protocol fee, token, reward, royalty or auction
 - No CPFP workflow
 - No rekey or refuel operation
-- No script-path spending, annex, or partial sighash
+- No script-path spending, annex or partial sighash
+
+## Key numbers
+
+- Participants per Circle: 2 to 16 inclusive
+- Marker script: exactly 42 bytes, `6a28` followed by a 40-byte payload
+- Minimum successor output: 1,000 sats
+- Weight: `246 + 402N` for 64-byte signatures, virtual bytes `ceil(weight / 4)`
+- Fee allocation: `q = floor(F / N)`, and the first `F mod N` slots each pay one extra satoshi
+- Lineage id: `SHA256(UTF8("WITC/lineage/v1") || wire_serialized_genesis_outpoint)`
+- Authoritative at one confirmation. Six confirmations is a display convention only.
+- Empty state hash: `90e749b7720fac379610d979e29998c7d650150548622f0a47d9d3e181f1be52`
 
 ## Install
 
@@ -101,14 +118,31 @@ Run `node dist/cli.js help` for complete usage.
 
 | Path | Purpose |
 |---|---|
-| `SPECIFICATION.md` | Normative final protocol rules |
-| `src/` | Reference codec, parser, validator, state engine, planner, SDK, and CLI |
-| [`schemas`](schemas/v1/) | JSON schemas for optional metadata and interchange |
-| [`test vectors`](test-vectors/v1/) | Golden signed transaction, marker, and full state-lifecycle fixtures |
-| `tests/` | Unit, property, schema, signature, validator, and state tests |
-| `docs/` | User, creator, developer, operator, and legal-review material |
-| `site/` | Static documentation website |
+| `SPECIFICATION.md` | Normative protocol rules |
+| `src/` | Reference codec, parser, validator, state engine, planner, SDK and CLI |
+| [`schemas/v1/`](schemas/v1/) | Seven JSON Schemas for metadata, interchange and state |
+| [`test-vectors/v1/`](test-vectors/v1/) | Golden signed transaction, marker cases and full state-lifecycle fixtures |
+| `tests/` | Unit, property, schema, signature, validator, state and site tests |
+| `docs/` | User, creator, developer, operator and legal-review material |
+| `assets/`, `*.html` | The published documentation site, served by GitHub Pages from `main` at the repository root |
 | `ops/` | Static-site deployment and security-header configuration |
+
+## Documentation site
+
+The site is hand-authored static HTML, CSS and vanilla JavaScript with no build step, no framework, no external fonts and no trackers. It is served by GitHub Pages from `main` at the repository root.
+
+| Page | Contents |
+|---|---|
+| [Overview](https://bitcoinuniverseio.github.io/witness-circles/) | What the protocol is, what a Circle proves, current status |
+| [Specification](https://bitcoinuniverseio.github.io/witness-circles/specification.html) | The normative rules with the full error code table |
+| [Guide](https://bitcoinuniverseio.github.io/witness-circles/guide.html) | Three worked examples taken from the committed vectors |
+| [Reference](https://bitcoinuniverseio.github.io/witness-circles/reference.html) | Terminology, indexer semantics, sizing, limits, security, checklist |
+| [Test vectors](https://bitcoinuniverseio.github.io/witness-circles/test-vectors.html) | Every valid and invalid case with its required outcome |
+| [Schemas](https://bitcoinuniverseio.github.io/witness-circles/schemas.html) | All seven published JSON Schemas |
+| [Simulator](https://bitcoinuniverseio.github.io/witness-circles/simulator.html) | Client-side circle builder, marker decoder and vector replay |
+| [Conformance](https://bitcoinuniverseio.github.io/witness-circles/conformance.html) | What a second implementation has to reproduce |
+
+`assets/witc.js` is a dependency-free browser reimplementation of the marker decoder, transaction codec, validator, fee allocator, lineage derivation and state engine. It reproduces every published vector, and `tests/site.test.ts` asserts that in CI. It checks witness shape only and never verifies Schnorr signatures, so it is not sufficient for authoritative indexing.
 
 ## Verification
 
@@ -118,11 +152,11 @@ npm run verify
 npm audit
 ```
 
-`npm run verify` runs formatting/lint checks, strict type checking, tests, the build, content/link checks, and both transaction and state-lifecycle vector verification.
+`npm run verify` runs formatting and lint checks, strict type checking, tests, the build, content and link checks, and both transaction and state-lifecycle vector verification.
 
 ## Independence
 
-Protocol correctness is derived from Bitcoin transaction data and confirmed prevouts. No Bitcoin Universe API, profile, manifest host, renderer, or commercial service is required. Optional metadata may disappear without changing protocol validity.
+Protocol correctness is derived from Bitcoin transaction data and confirmed prevouts. No Bitcoin Universe API, profile, manifest host, renderer or commercial service is required. Optional metadata may disappear without changing protocol validity.
 
 ## Security
 

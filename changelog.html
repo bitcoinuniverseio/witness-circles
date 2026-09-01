@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Witness Circles specification and documentation changelog</title>
+<meta name="description" content="Version history for the Witness Circles specification, the reference implementation and this documentation site, including the versioning policy for each.">
+<link rel="canonical" href="https://bitcoinuniverseio.github.io/witness-circles/changelog.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Witness Circles protocol documentation">
+<meta property="og:title" content="Witness Circles changelog">
+<meta property="og:description" content="Version history for the Witness Circles specification, the reference implementation and this documentation site, including the versioning policy for each.">
+<meta property="og:url" content="https://bitcoinuniverseio.github.io/witness-circles/changelog.html">
+<meta property="og:image" content="https://bitcoinuniverseio.github.io/witness-circles/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Concentric rings with member nodes joined by attestation arcs around a WITC marker">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Witness Circles changelog">
+<meta name="twitter:description" content="Version history for the Witness Circles specification, the reference implementation and this documentation site, including the versioning policy for each.">
+<meta name="twitter:image" content="https://bitcoinuniverseio.github.io/witness-circles/assets/og-card.png">
+<meta name="theme-color" content="#070c10" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f5f8f9" media="(prefers-color-scheme: light)">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14" fill="none" stroke="var(--dim)" stroke-width="1.5"/><circle cx="16" cy="16" r="9" fill="none" stroke="var(--accent)" stroke-width="2.5"/><circle cx="16" cy="2.5" r="2.6" fill="var(--accent)"/><circle cx="28" cy="23" r="2.6" fill="var(--accent)"/><circle cx="4" cy="23" r="2.6" fill="var(--accent)"/></svg><span>Witness Circles<small>WITC protocol</small></span></a>
+    <div class="search">
+      <label class="sr-only" for="site-search">Search this documentation</label>
+      <input id="site-search" type="search" placeholder="Search (press /)" autocomplete="off" data-search-input data-search-base="" aria-describedby="search-hint">
+      <ul class="search-results" data-search-results aria-live="polite"></ul>
+    </div>
+    <div class="header-tools">
+      <button class="icon-button" type="button" data-theme-toggle aria-pressed="false">Light theme</button>
+      <button class="nav-toggle" type="button" data-nav-toggle aria-controls="site-nav">Menu</button>
+    </div>
+    <nav class="site-nav" id="site-nav" data-nav aria-label="Documentation sections">
+      <a href="index.html">Overview</a>
+      <a href="specification.html">Specification</a>
+      <a href="guide.html">Guide</a>
+      <a href="reference.html">Reference</a>
+      <a href="test-vectors.html">Test vectors</a>
+      <a href="schemas.html">Schemas</a>
+      <a href="simulator.html">Simulator</a>
+      <a href="conformance.html">Conformance</a>
+      <a href="changelog.html" aria-current="page">Changelog</a>
+    </nav>
+    <p id="search-hint" class="sr-only">Search requires JavaScript. Every page is linked from the navigation.</p>
+  </div>
+</header>
+<main id="main">
+<div class="shell">
+  <div class="page-head">
+    <p class="eyebrow">History</p>
+    <h1>Changelog</h1>
+    <p class="lede">Protocol semantics carry their own explicit version byte. The reference package follows Semantic Versioning while it is pre-1.0. This site is versioned with the repository.</p>
+  </div>
+
+  <h2 id="site-2026-09-01">Documentation site, 2026-09-01</h2>
+  <p>Specification 1.0.0. Verified at commit <code>6507df3848c9</code>.</p>
+  <h3>Added</h3>
+  <ul>
+    <li>Independent documentation site published from the repository root, replacing the previous marketing-oriented site under <code>site/</code>.</li>
+    <li>Complete normative specification page with numbered grammar rules, the full error code table, and a marker byte-layout walkthrough.</li>
+    <li>Guide with three worked examples taken from the committed vectors, including the odd-remainder fee case.</li>
+    <li>Reference page with terminology, indexer confirmation, mempool and reorganization semantics, a fee and size table for every participant count from 2 to 16, limitations, security considerations and an implementation checklist.</li>
+    <li>Test vectors page publishing every committed valid and invalid case with its required error code and expected state hashes.</li>
+    <li>JSON Schema reference covering all seven published schemas.</li>
+    <li>Conformance page defining three implementation levels, what must agree, the differential procedure and a self-declaration template.</li>
+    <li>Circle state simulator: a client-side reimplementation of the marker decoder, transaction codec, validator, fee allocator, lineage derivation and state engine, which replays every published vector in the browser.</li>
+    <li>Build-free local search over an authored index, a helpful 404 page, <code>llms.txt</code>, <code>sitemap.xml</code> and <code>robots.txt</code>.</li>
+  </ul>
+  <h3>Changed</h3>
+  <ul>
+    <li>Repository links corrected from the <code>bitcoinuniverse</code> organization to the owning organization <code>bitcoinuniverseio</code>.</li>
+    <li><code>docs.manifest.json</code> enriched: the specification and all seven schemas are declared, the network list now reflects that all four network identifiers are parseable, and the verified commit was updated.</li>
+    <li>Corrected mangled wording in <code>SPECIFICATION.md</code> section 5, 11 and 13 that had been introduced by an earlier find-and-replace over the document.</li>
+  </ul>
+
+  <h2 id="v0-1-0">Reference implementation 0.1.0, 2026-08-01</h2>
+  <h3>Added</h3>
+  <ul>
+    <li>Complete <code>CIRCLE</code> protocol specification.</li>
+    <li>Exact marker and RFC 8785 manifest utilities.</li>
+    <li>Strict Bitcoin transaction codec with minimal CompactSize enforcement.</li>
+    <li>BIP341 key-path sighash and BIP340 signature verification.</li>
+    <li>Deterministic validator and equal fee allocation.</li>
+    <li>Transaction and PSBT planning model.</li>
+    <li>Wallet signing-intent inspector.</li>
+    <li>Rollback-capable reference lineage state engine.</li>
+    <li>SDK, CLI, versioned schemas, golden signed transaction, state-lifecycle vector and tests.</li>
+    <li>User, creator, developer, operator, security, governance and legal-review documentation.</li>
+  </ul>
+  <h3>Fixed</h3>
+  <ul>
+    <li>Aligned manifest runtime validation with JSON Schema code-point limits, exact UTC timestamps, well-formed Unicode and lowercase alias keys.</li>
+    <li>Defined the authoritative state-root preimage and committed a reproducible golden transition hash.</li>
+    <li>Rejected non-integral planner positions, whitespace-padded manifest text, and aggregate inputs above Bitcoin <code>MAX_MONEY</code>.</li>
+    <li>Rejected unsafe state integers, outpoint indices above uint32, and state amounts above Bitcoin <code>MAX_MONEY</code> before hashing.</li>
+  </ul>
+  <h3>Deliberate exclusions</h3>
+  <ul>
+    <li>Mainnet production declaration.</li>
+    <li>Transfer, market, CPFP, refuel, rekey, token, reward and governance operations.</li>
+  </ul>
+
+  <h2 id="policy">Versioning policy</h2>
+  <ul>
+    <li>Protocol behaviour is versioned by the marker version byte. Version <code>0x01</code> is final and will not gain new operations.</li>
+    <li>Schemas and vectors are versioned by directory. <code>v1</code> files are never edited to describe new behaviour.</li>
+    <li>The reference package version describes the API surface, not the protocol.</li>
+    <li>This site records the commit it was verified against in every page footer.</li>
+  </ul>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="shell">
+    <dl class="footer-meta">
+      <div><dt>Owning repository</dt><dd><a href="https://github.com/bitcoinuniverseio/witness-circles">bitcoinuniverseio/witness-circles</a></dd></div>
+      <div><dt>Source path</dt><dd><code>CHANGELOG.md</code></dd></div>
+      <div><dt>Specification version</dt><dd>1.0.0</dd></div>
+      <div><dt>Lifecycle</dt><dd>Experimental</dd></div>
+      <div><dt>Chain and networks</dt><dd>Bitcoin. Signet and regtest for creation, all four network identifiers for parsing.</dd></div>
+      <div><dt>Last verified</dt><dd><time datetime="2026-09-01">2026-09-01</time> at commit <code>6507df3848c9</code></dd></div>
+    </dl>
+    <ul class="footer-links">
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/edit/main/CHANGELOG.md">Edit this page on GitHub</a></li>
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/blob/main/SPECIFICATION.md">Normative specification</a></li>
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/security/policy">Report a vulnerability</a></li>
+      <li><a href="https://docs.bitcoinuniverse.io">Bitcoin Universe documentation portal</a></li>
+      <li><a href="llms.txt">llms.txt</a></li>
+    </ul>
+    <p class="footer-note">Witness Circles is an original Bitcoin Universe protocol. It creates no token, no balance, no transferable asset and no market. A confirmed Circle proves that distinct Taproot output keys authorized one exact Bitcoin transaction, and nothing more. Code is MIT licensed; the specification and test vectors are dedicated under CC0 1.0.</p>
+  </div>
+</footer>
+</body>
+</html>

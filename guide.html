@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Witness Circles guide with worked transaction examples</title>
+<meta name="description" content="A plain-language walkthrough of Witness Circles with three worked examples taken from the published vectors, plus an honest matrix of what supports the protocol today.">
+<link rel="canonical" href="https://bitcoinuniverseio.github.io/witness-circles/guide.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Witness Circles protocol documentation">
+<meta property="og:title" content="Witness Circles guide">
+<meta property="og:description" content="A plain-language walkthrough of Witness Circles with three worked examples taken from the published vectors, plus an honest matrix of what supports the protocol today.">
+<meta property="og:url" content="https://bitcoinuniverseio.github.io/witness-circles/guide.html">
+<meta property="og:image" content="https://bitcoinuniverseio.github.io/witness-circles/assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Concentric rings with member nodes joined by attestation arcs around a WITC marker">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Witness Circles guide">
+<meta name="twitter:description" content="A plain-language walkthrough of Witness Circles with three worked examples taken from the published vectors, plus an honest matrix of what supports the protocol today.">
+<meta name="twitter:image" content="https://bitcoinuniverseio.github.io/witness-circles/assets/og-card.png">
+<meta name="theme-color" content="#070c10" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f5f8f9" media="(prefers-color-scheme: light)">
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="assets/styles.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="index.html"><svg viewBox="0 0 32 32" aria-hidden="true" focusable="false"><circle cx="16" cy="16" r="14" fill="none" stroke="var(--dim)" stroke-width="1.5"/><circle cx="16" cy="16" r="9" fill="none" stroke="var(--accent)" stroke-width="2.5"/><circle cx="16" cy="2.5" r="2.6" fill="var(--accent)"/><circle cx="28" cy="23" r="2.6" fill="var(--accent)"/><circle cx="4" cy="23" r="2.6" fill="var(--accent)"/></svg><span>Witness Circles<small>WITC protocol</small></span></a>
+    <div class="search">
+      <label class="sr-only" for="site-search">Search this documentation</label>
+      <input id="site-search" type="search" placeholder="Search (press /)" autocomplete="off" data-search-input data-search-base="" aria-describedby="search-hint">
+      <ul class="search-results" data-search-results aria-live="polite"></ul>
+    </div>
+    <div class="header-tools">
+      <button class="icon-button" type="button" data-theme-toggle aria-pressed="false">Light theme</button>
+      <button class="nav-toggle" type="button" data-nav-toggle aria-controls="site-nav">Menu</button>
+    </div>
+    <nav class="site-nav" id="site-nav" data-nav aria-label="Documentation sections">
+      <a href="index.html">Overview</a>
+      <a href="specification.html">Specification</a>
+      <a href="guide.html" aria-current="page">Guide</a>
+      <a href="reference.html">Reference</a>
+      <a href="test-vectors.html">Test vectors</a>
+      <a href="schemas.html">Schemas</a>
+      <a href="simulator.html">Simulator</a>
+      <a href="conformance.html">Conformance</a>
+      <a href="changelog.html">Changelog</a>
+    </nav>
+    <p id="search-hint" class="sr-only">Search requires JavaScript. Every page is linked from the navigation.</p>
+  </div>
+</header>
+<main id="main">
+<div class="shell">
+  <div class="page-head">
+    <p class="eyebrow">Guide</p>
+    <h1>How a circle is built, signed and read back</h1>
+    <p class="lede">Every number on this page is taken from the vectors committed in <code>test-vectors/v1/</code>. Nothing here is illustrative.</p>
+  </div>
+  <div class="with-aside">
+  <aside class="page-aside">
+    <h2>On this page</h2>
+    <ol>
+      <li><a href="#idea">The idea</a></li>
+      <li><a href="#lifecycle">Session lifecycle</a></li>
+      <li><a href="#example-a">Example A: genesis circle</a></li>
+      <li><a href="#example-b">Example B: continuation</a></li>
+      <li><a href="#example-c">Example C: closure</a></li>
+      <li><a href="#support">Support matrix</a></li>
+      <li><a href="#pitfalls">Common mistakes</a></li>
+    </ol>
+  </aside>
+  <div>
+
+  <h2 id="idea">The idea</h2>
+  <p>Imagine four people who want a durable record that they were all party to the same moment. They do not want a token, a website account, or a database row that someone can edit. Each of them puts one confirmed Taproot coin into a single Bitcoin transaction, signs the whole transaction, and gets that coin back to the same key minus a quarter of the miner fee. Once it confirms, anyone with a Bitcoin node can check the record, and nobody can revise it.</p>
+  <p>That is all Witness Circles does. The circle is the transaction. The membership record is the set of input keys. The proof is the four signatures, each of which commits to every input and every output.</p>
+
+  <h2 id="lifecycle">Session lifecycle</h2>
+  <p>The protocol has nothing to say about how participants find each other. That is application territory. The reference implementation ships a planner that produces the frozen unsigned transaction, and a signing-intent inspector that a wallet runs before it signs.</p>
+  <ol>
+    <li><strong>Context.</strong> Someone writes a small JSON manifest (title, nonce, created, expires) and hashes it with RFC 8785. That hash goes in the marker.</li>
+    <li><strong>Plan.</strong> <code>buildCirclePlan</code> sorts the participant inputs, estimates the virtual size, multiplies by the chosen fee rate, splits the fee, and emits an unsigned transaction plus its fingerprint. It refuses any participant whose fee share would exceed their declared cap (<code>FEE_CAP_EXCEEDED</code>) or whose successor would fall under 1,000 sats (<code>SUCCESSOR_DUST</code>).</li>
+    <li><strong>Freeze.</strong> The unsigned transaction is now immutable. Its SHA-256 fingerprint is what each wallet compares against the invitation.</li>
+    <li><strong>Inspect.</strong> Each wallet calls <code>inspectUnsignedSigningIntent</code>, which re-validates the whole grammar in <code>unsigned</code> mode and returns the signer's own outpoint, value, successor, fee share, total fee, fee rate, context hash, and two fixed warnings about public linkage and the claim boundary.</li>
+    <li><strong>Sign.</strong> Each participant returns a non-finalized <code>PSBT_IN_TAP_KEY_SIG</code>. The coordinator verifies each contribution before merging. A coordinator never holds a key.</li>
+    <li><strong>Broadcast and confirm.</strong> At one confirmation in the best chain the Circle is authoritative and the state transition applies.</li>
+  </ol>
+  <div class="note"><p>Because every signature commits to every input and output, a replacement transaction needs a new signature from every participant. There is no way for one member to change the fee or drop out after signing without the whole group signing again.</p></div>
+
+  <h2 id="example-a">Example A: a genesis circle for three participants</h2>
+  <p>This is <code>test-vectors/v1/golden-circle.json</code> in full. Signet, block height 200, three participants who have never been in a Circle before.</p>
+  <h3>The context manifest</h3>
+  <pre><code>{"created":"2026-08-01T18:00:00Z","expires":"2026-08-01T19:00:00Z","kind":"circle",
+ "nonce":"90e8f5cf27f04c89a6657bc9c60e3021","orbit":"signet-builders","protocol":"witc",
+ "title":"Reference genesis circle","version":1}</code></pre>
+  <p>That is the RFC 8785 serialization exactly: object keys sorted, no whitespace. Its SHA-256 is <code class="hex">ad2608134839e732280cb93bdd5b8682626dce5748a65c437a39cdcb680c2a82</code>, which is the last 32 bytes of the marker.</p>
+  <h3>The inputs</h3>
+  <div class="scroll-x"><table>
+    <thead><tr><th scope="col" class="num">Slot</th><th scope="col">Outpoint</th><th scope="col" class="num">Value</th><th scope="col">scriptPubKey</th><th scope="col" class="num">Height</th></tr></thead>
+    <tbody>
+      <tr><th scope="row" class="num">0</th><td class="hex">1111…1111:0</td><td class="num">30,000</td><td class="hex">5120 79be667e…16f81798</td><td class="num">199</td></tr>
+      <tr><th scope="row" class="num">1</th><td class="hex">2222…2222:1</td><td class="num">40,000</td><td class="hex">5120 c6047f94…5c709ee5</td><td class="num">199</td></tr>
+      <tr><th scope="row" class="num">2</th><td class="hex">3333…3333:2</td><td class="num">50,000</td><td class="hex">5120 f9308a01…bce036f9</td><td class="num">199</td></tr>
+    </tbody>
+  </table></div>
+  <p>The slot order is not a choice. Rule 6.9 sorts inputs by display txid bytes then vout, so any two implementations independently derive the same slots and therefore the same fee assignment.</p>
+  <h3>The arithmetic</h3>
+  <pre><code>N       = 3
+weight  = 246 + 402 * 3          = 1452
+vbytes  = ceil(1452 / 4)         = 363
+fee     = 363 vB * 10 sat/vB     = 3630 sats
+q       = floor(3630 / 3)        = 1210
+r       = 3630 mod 3             = 0
+
+successor(0) = 30000 - 1210 = 28790
+successor(1) = 40000 - 1210 = 38790
+successor(2) = 50000 - 1210 = 48790</code></pre>
+  <p>Because the remainder is zero every share is identical. When the fee does not divide evenly, the first <code>r</code> slots each pay one extra satoshi. That rule is what makes the allocation reproducible rather than negotiated.</p>
+  <h3>The result</h3>
+  <div class="scroll-x"><table>
+    <thead><tr><th scope="col">Field</th><th scope="col">Value</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">txid</th><td class="hex">3703d5b332ebf2871a0a24066f7ea4b84dd3e9ebca1b1a879140e844c64b0f65</td></tr>
+      <tr><th scope="row">wtxid</th><td class="hex">772b6d1d179e6f5ba1c4699486a754ef7681b6299ee0e023fc2a5dd0c11245ab</td></tr>
+      <tr><th scope="row">Virtual size</th><td class="num">363 vB</td></tr>
+      <tr><th scope="row">Fee</th><td class="num">3,630 sats</td></tr>
+      <tr><th scope="row">Lineages created</th><td class="hex">4bc0f5c8…, 63c22eae…, ee745631…</td></tr>
+      <tr><th scope="row">State hash after transition</th><td class="hex">07b97f0c2cbaa172e66a2137fefbee64c5a05f03e03967d46936cd14070523f1</td></tr>
+    </tbody>
+  </table></div>
+  <p>The lineage identifiers are not derived from the Circle. Each one is <code>SHA256("WITC/lineage/v1" || wire_outpoint)</code> of the participant's own genesis outpoint, so a participant can compute their lineage identifier before the Circle exists.</p>
+  <p><a href="simulator.html">Rebuild this exact circle in the simulator.</a> The default state of the builder is this vector, so you can watch what happens when you change one value.</p>
+
+  <h2 id="example-b">Example B: two of the three come back</h2>
+  <p>At height 201 the holders of slots 0 and 1 form a second Circle by spending their successor shards from example A. This is the <code>continuation</code> section of <code>state-lifecycle.json</code>.</p>
+  <div class="scroll-x"><table>
+    <thead><tr><th scope="col">Field</th><th scope="col">Value</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Inputs</th><td class="hex">3703…0f65:1 (28,790) and 3703…0f65:2 (38,790)</td></tr>
+      <tr><th scope="row">Participants</th><td class="num">2, so 263 vB</td></tr>
+      <tr><th scope="row">Fee</th><td class="num">1,315 sats, q = 657, r = 1</td></tr>
+      <tr><th scope="row">Fee shares</th><td class="num">slot 0 pays 658, slot 1 pays 657</td></tr>
+      <tr><th scope="row">txid</th><td class="hex">f7c7ecb3be4ee1925fc97111afde797633de0fae797d0a12383aecb6868328ef</td></tr>
+      <tr><th scope="row">State hash</th><td class="hex">b29662d78f73f3f8940b2dccaf935dc2a7f1ceba21ef6b1c5b11a7d7f3f5a6fc</td></tr>
+    </tbody>
+  </table></div>
+  <p>This is the odd-remainder case: 1315 is not divisible by 2, so slot 0 pays the extra satoshi. Note what did <em>not</em> happen. No new lineage was created. The two existing lineages advanced, their <code>circleCount</code> went from 1 to 2, and the indexer recorded two continuation edges pointing from the genesis Circle to this one. The third lineage was untouched and stays active.</p>
+  <figure class="figure">
+<svg viewBox="0 0 900 330" role="img" aria-labelledby="lineage-title lineage-desc">
+<title id="lineage-title">Lineages advancing through two Circles and one closure</title>
+<desc id="lineage-desc">Three lineages are created by the genesis Circle at height 200. Two of them continue into a second Circle at height 201, which the indexer records as continuation edges. At height 202 an ordinary Bitcoin spend consumes one active shard, which closes that lineage permanently. The third lineage never continues and stays active.</desc>
+<text x="30" y="32" class="d-label-muted">height 200</text>
+<text x="360" y="32" class="d-label-muted">height 201</text>
+<text x="690" y="32" class="d-label-muted">height 202</text>
+<circle cx="90" cy="160" r="40" class="d-ring-accent"/>
+<text x="90" y="158" text-anchor="middle" class="d-label-mono">circle</text>
+<text x="90" y="174" text-anchor="middle" class="d-label-mono">3703…0f65</text>
+<circle cx="420" cy="120" r="40" class="d-ring-accent"/>
+<text x="420" y="118" text-anchor="middle" class="d-label-mono">circle</text>
+<text x="420" y="134" text-anchor="middle" class="d-label-mono">f7c7…28ef</text>
+<rect x="686" y="176" width="120" height="52" rx="10" class="d-core" stroke-dasharray="5 4"/>
+<text x="746" y="198" text-anchor="middle" class="d-label-mono">ordinary</text>
+<text x="746" y="216" text-anchor="middle" class="d-label-mono">spend</text>
+<path d="M 130 140 C 240 90 300 90 380 112" class="d-edge-on"/>
+<path d="M 130 160 C 240 150 300 130 380 126" class="d-edge-on"/>
+<path d="M 130 185 C 300 230 520 250 690 250" class="d-edge"/>
+<path d="M 460 128 C 550 150 600 190 686 200" class="d-edge-on"/>
+<text x="250" y="86" text-anchor="middle" class="d-accent-text">lineage 4bc0… continues</text>
+<text x="250" y="146" text-anchor="middle" class="d-accent-text">lineage 63c2… continues</text>
+<text x="330" y="272" text-anchor="middle" class="d-label-muted">lineage ee74… stays active, never continued</text>
+<text x="560" y="176" text-anchor="middle" class="d-label-muted">shard spent outside the protocol</text>
+<text x="30" y="310" class="d-label-muted">Closure is a property of the UTXO set, not of parser opinion.</text>
+</svg>
+<figcaption>The lifecycle committed in test-vectors/v1/state-lifecycle.json: one genesis Circle, one continuation, and one ordinary spend that closes a lineage. A consensus-valid transaction that spends an active shard without satisfying every Circle rule closes that lineage. No Bitcoin is burned, and the historical Circles remain in the best-chain record.</figcaption>
+</figure>
+
+  <h2 id="example-c">Example C: an ordinary spend ends a lineage</h2>
+  <p>At height 202 a transaction that is not a Circle spends <code>f7c7…28ef:1</code>, one of the active shards. It might be the owner moving funds, paying someone, or consolidating. The protocol does not care what it was.</p>
+  <ul>
+    <li>That lineage becomes <code>closed</code>, its <code>currentOutpoint</code> becomes null, and <code>closedByTxid</code> records the spending transaction.</li>
+    <li>The revision still increments, because a closure is a state transition.</li>
+    <li>No Bitcoin is burned or forfeited. The coin simply left the protocol.</li>
+    <li>Every historical Circle that lineage took part in remains in the record.</li>
+  </ul>
+  <p>The state hash after that closure is <code class="hex">faf7f730b9b48b39c4509dc3ccb23c94cac6979d334a57fbd1eda20dab7af84c</code>. Roll the three transitions back in reverse and you land on the continuation hash, then the genesis hash, then the empty-state hash. That round trip is exactly what an indexer performs during a chain reorganization, and it is committed in the vector so two implementations cannot silently diverge.</p>
+
+  <h2 id="support">What actually supports Witness Circles today</h2>
+  <p>Only claims that can be checked in Bitcoin Universe source code appear here.</p>
+  <div class="scroll-x"><table>
+    <thead><tr><th scope="col">Component</th><th scope="col">Status</th><th scope="col">Evidence</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">Reference SDK and CLI</th><td>Available</td><td><code>src/sdk.ts</code>, <code>src/cli.ts</code> in this repository, package <code>@bitcoinuniverse/witness-circles</code> 0.1.0. No reviewed registry release yet.</td></tr>
+      <tr><th scope="row">Reference state engine</th><td>Available</td><td><code>src/state.ts</code>, with rollback and a committed state hash.</td></tr>
+      <tr><th scope="row">Dedicated indexer</th><td>Available as source</td><td><a href="https://github.com/bitcoinuniverseio/index-witness-circles">bitcoinuniverseio/index-witness-circles</a>.</td></tr>
+      <tr><th scope="row">Wallet integration</th><td>Not currently supported in Bitcoin Universe products</td><td>No wallet in the organization implements the section 13 signing flow. The requirements are specified so that any wallet can.</td></tr>
+      <tr><th scope="row">Marketplace or trade path</th><td>Not applicable and not implemented</td><td>Witness Circles has no entry in the marketplace protocol registry. The protocol defines no transferable asset, so there is nothing a marketplace could list.</td></tr>
+      <tr><th scope="row">Mainnet creation</th><td>Disabled</td><td><code>encodeMarkerPayload</code> and <code>buildCirclePlan</code> reject any network other than Signet and regtest with <code>INVALID_NETWORK</code>.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2 id="pitfalls">Common mistakes</h2>
+  <dl class="terms">
+    <dt>Using a wallet's change output as a participant input</dt>
+    <dd>A Circle publicly links every participating input forever. Use a dedicated UTXO whose history you are willing to publish. Dedicated inputs reduce unrelated exposure; they do not create privacy.</dd>
+    <dt>Letting a wallet auto-select an active shard</dt>
+    <dd>An active shard is an ordinary UTXO to a wallet. If coin selection spends it in an unrelated payment, the lineage closes permanently. Wallets that support the protocol should protect active shards from automatic selection.</dd>
+    <dt>Reusing one key for two slots</dt>
+    <dd>Rule 6.8 rejects it with <code>DUPLICATE_SCRIPT</code>. Two slots controlled by one person is not detectable, but two slots with one key is, and the protocol refuses it.</dd>
+    <dt>Treating the manifest as truth</dt>
+    <dd>The manifest is an untrusted label committed by hash. It can be withheld or lost without affecting validity, and its titles and aliases must be escaped before display.</dd>
+    <dt>Expecting a fee bump</dt>
+    <dd>There is no CPFP workflow and no single-party RBF. If the fee rate was too low, every participant signs again or the transaction waits.</dd>
+  </dl>
+  </div>
+  </div>
+</div>
+</main>
+<footer class="site-footer">
+  <div class="shell">
+    <dl class="footer-meta">
+      <div><dt>Owning repository</dt><dd><a href="https://github.com/bitcoinuniverseio/witness-circles">bitcoinuniverseio/witness-circles</a></dd></div>
+      <div><dt>Source path</dt><dd><code>docs/user-guide.md, docs/developers/</code></dd></div>
+      <div><dt>Specification version</dt><dd>1.0.0</dd></div>
+      <div><dt>Lifecycle</dt><dd>Experimental</dd></div>
+      <div><dt>Chain and networks</dt><dd>Bitcoin. Signet and regtest for creation, all four network identifiers for parsing.</dd></div>
+      <div><dt>Last verified</dt><dd><time datetime="2026-09-01">2026-09-01</time> at commit <code>6507df3848c9</code></dd></div>
+    </dl>
+    <ul class="footer-links">
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/edit/main/guide.html">Edit this page on GitHub</a></li>
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/blob/main/SPECIFICATION.md">Normative specification</a></li>
+      <li><a href="https://github.com/bitcoinuniverseio/witness-circles/security/policy">Report a vulnerability</a></li>
+      <li><a href="https://docs.bitcoinuniverse.io">Bitcoin Universe documentation portal</a></li>
+      <li><a href="llms.txt">llms.txt</a></li>
+    </ul>
+    <p class="footer-note">Witness Circles is an original Bitcoin Universe protocol. It creates no token, no balance, no transferable asset and no market. A confirmed Circle proves that distinct Taproot output keys authorized one exact Bitcoin transaction, and nothing more. Code is MIT licensed; the specification and test vectors are dedicated under CC0 1.0.</p>
+  </div>
+</footer>
+</body>
+</html>
