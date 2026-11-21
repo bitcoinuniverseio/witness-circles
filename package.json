@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.7",
-    "@scure/btc-signer": "2.3.0",
+    "@scure/btc-signer": "2.4.1",
     "@types/node": "26.2.0",
     "@vitest/coverage-v8": "4.1.11",
     "ajv": "8.20.0",
